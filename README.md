@@ -19,11 +19,19 @@ Backend for levering av endepunkter for å hente og aggregere på mangfoldsdata 
     - Google Cloud Service Account med tilgang til aktuell BigQuery-tabell
     - (Valgfritt) Docker, hvis du vil kjøre lokalt i container
 
-2. **Sett opp miljøvariabler:**
-   ```bash
-   export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
-   export BIGQUERY_PROJECT_ID=nav-prosjekt-id
-   ```
+<!-- TODO: Oppdatere dette -->
+### Autentisering mot Google Cloud
+Per nå må du logge inn med din egen Google-bruker for å kjøre applikasjonen lokalt:
+
+```bash
+gcloud auth application-default login
+unset GOOGLE_APPLICATION_CREDENTIALS
+```
+
+Oppdatering om annen autentisering (for produksjon/lansering) kommer senere.
+
+
+
 
 3. **Bygg og start server:**
    ```bash
