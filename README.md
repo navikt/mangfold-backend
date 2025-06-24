@@ -1,73 +1,61 @@
-# backend-golden-path
+# NAV Mangfolds-API
 
-![workflow](https://github.com/navikt/backend-golden-path/actions/workflows/main.yaml/badge.svg)
+Backend for levering av endepunkter for å hente og aggregere på mangfoldsdata for ansatte i NAV (direktoratet/etaten), med fokus på kjønnsfordeling, aldersgrupper, ansiennitet og tilhørighet i organisasjonen. Data hentes fra BigQuery og eksponeres via REST-API-endepunkter i Ktor.
 
-## Overview
+## Funksjonalitet
+- Henter aggregerte data om kjønnsfordeling, aldersgrupper og ansiennitet per avdeling, seksjon og andre grupperinger.
+- Tilrettelegger for visualisering av mangfold i NAV på gruppenivå - ingen identifiserende persondata eksponeres.
 
-This is a demo repository that offers a golden path for JVM projects.
-The workflows are defined using GitHub Actions and are located in the `.github/workflows` directory.
+## Teknologi
+- [Ktor](https://ktor.io/) - Kotlin-basert webserver
+- [Google BigQuery](https://cloud.google.com/bigquery) - Datavarehus for HR-data
+- [Kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) - JSON-serialisering
+- [Gradle](https://gradle.org/) - Byggeverktøy
 
-## After using this template
+## Kjøring lokalt
 
-- Look over each `TODO` in this repository and make appropriate changes.
-- Remember to add the repository to your team in [Nais console](https://console.nav.cloud.nais.io/).
-- Change this README to suit your application. (You can always view the backend-golden-path README by clicking "generated from [navikt/backend-golden-path](https://github.com/navikt/backend-golden-path)" in your repository's header)
-- Make the rest of your application!
+1. **Forutsetninger:**
+    - Java 17+
+    - Google Cloud Service Account med tilgang til aktuell BigQuery-tabell
+    - (Valgfritt) Docker, hvis du vil kjøre lokalt i container
 
-## Workflows
+2. **Sett opp miljøvariabler:**
+   ```bash
+   export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+   export BIGQUERY_PROJECT_ID=nav-prosjekt-id
+   ```
 
-### 1. Run test & build on PRs
+3. **Bygg og start server:**
+   ```bash
+   ./gradlew build
+   ./gradlew run
+   ```
 
-This workflow is triggered on pull requests and performs the following steps:
+4. **Serveren vil som standard lytte på port 8080.**
 
-- **Checkout the code**: Uses the `actions/checkout` action to checkout the code.
-- **Setup Java**: Uses the `actions/setup-java` action to set up Java 21 with the Temurin distribution and cache Gradle dependencies.
-- **Setup Gradle**: Uses the `gradle/actions/setup-gradle` action to set up Gradle & verify the gradle-wrapper.
-- **Test & build**: Runs the `./gradlew test build` command to test and build the project.
+<!-- TODO: ## Kjøring med Docker -->
 
-Workflow file: `.github/workflows/prs.yaml`
+## API-endepunkter
 
-### 2. Build and deploy main
+### Hent total kjønnsfordeling
+```
+GET /gender-stats
+```
 
-This workflow triggers on push to main and when dependabot updates the dependencies.
+### Kjønnsfordeling per avdeling
+```
+GET /gender-per-department
+```
 
-- **Setup same as test workflow** (see above).
-- ...
-- **Build & push docker image + SBOM**: Uses the `nais/docker-build-push` action to build and push a Docker image and generate a Software Bill of Materials (SBOM) file.
-- **Generate and submit dependency graph**: Uses the `gradle/actions/dependency-submission` action to generate and submit the dependency graph to Github.
-- **Scan docker image for secrets**: Uses the `aquasecurity/trivy-action` action to scan the Docker image for secrets and generates a SARIF file.
-- **Upload SARIF file**: Uses the `github/codeql-action/upload-sarif` action to upload the SARIF file.
+### Kjønnsfordeling per avdeling og aldersgruppe
+```
+GET /gender-age-per-department
+```
 
-Workflow file: `.github/workflows/main.yaml`
+## Videre arbeid
+- Flere variabler: lønn, etnisk bakgrunn, funksjonsvariasjoner m.m.
 
-### 3. Dependabot auto-merge
-
-This workflow is triggered on pull requests created by Dependabot and performs the following steps:
-
-- **Automerge Dependabot PRs**: Uses the `navikt/automerge-dependabot` action to auto-merge Dependabot pull requests.
-
-Workflow file: `.github/workflows/dependabot-automerge.yml`
-
-### 4. CodeQL Analysis
-
-This workflow is triggered on push and pull requests to perform CodeQL analysis.
-
-- **Checkout the code**: Uses the `actions/checkout` action to checkout the code.
-- **Initialize CodeQL**: Uses the `github/codeql-action/init` action to initialize the CodeQL analysis.
-- **Perform CodeQL analysis**: Uses the `github/codeql-action/analyze` action to perform the CodeQL analysis.
-
-Workflow file: `.github/workflows/codeql.yml`
-
-## License
-[MIT](LICENSE).
-
-## Contact
-
-This project is maintained by [@appsec](https://github.com/orgs/navikt/teams/appsec).
-
-Questions and/or feature requests? Please create an [issue](https://github.com/navikt/appsec-stats/issues).
-
-If you work in [@navikt](https://github.com/navikt) you can reach us at the Slack channel [#appsec](https://nav-it.slack.com/archives/C06P91VN27M).
+**Kontakt**  
+Team Heda
 
 
-# mangfold-backend
