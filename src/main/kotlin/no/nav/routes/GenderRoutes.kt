@@ -14,19 +14,19 @@ import no.nav.models.DepartmentGenderCount
 
 fun Application.genderRoutes() {
     val logger = LoggerFactory.getLogger("GenderRoutes")
+    val projectId = System.getenv("BIGQUERY_PROJECT_ID")
+        ?: throw IllegalStateException("BIGQUERY_PROJECT_ID må settes som miljøvariabel")
 
     routing {
         get("/gender-stats") {
             logger.info("Kaller hentTotalKjonnStatistikk")
             try {
-                val resultMap = hentTotalKjonnStatistikk("heda-prod-2664")
-
+                val resultMap = hentTotalKjonnStatistikk(projectId)
                 val response = GenderStatsResponse(
                     totalKjonnsfordeling = resultMap.map { (kjonn, antall) ->
                         GenderCount(kjonn = kjonn, antall = antall)
                     }
                 )
-
                 call.respond(response)
             } catch (e: Exception) {
                 logger.error("Feil i gender-stats", e)
@@ -39,9 +39,8 @@ fun Application.genderRoutes() {
 
         get("/gender-per-department") {
             logger.info("Kaller hentKjonnPerAvdeling")
-
             try {
-                val result = hentKjonnPerAvdeling("heda-prod-2664")
+                val result = hentKjonnPerAvdeling(projectId)
                 call.respond(result)
             }  catch (e: Exception) {
                 logger.error("Feil i gender-per-department", e)
@@ -55,7 +54,7 @@ fun Application.genderRoutes() {
         get("/gender-age-per-department") {
             logger.info("Kaller hentAldersgruppeKjonnPerAvdeling")
             try {
-                val result = hentAldersgruppeKjonnPerAvdeling("heda-prod-2664")
+                val result = hentAldersgruppeKjonnPerAvdeling(projectId)
                 call.respond(result)
             } catch (e: Exception) {
                 logger.error("Feil i gender-age-per-department", e)

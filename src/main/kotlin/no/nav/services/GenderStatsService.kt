@@ -7,13 +7,14 @@ import com.google.cloud.bigquery.JobInfo
 import java.util.*
 import no.nav.models.DepartmentGenderCount
 import no.nav.models.AvdelingAlderKjonnCount
+import no.nav.Config
 
 fun hentTotalKjonnStatistikk(projectId: String): Map<String, Long> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT kjonn, COUNT(*) AS antall
-        FROM `heda-prod-2664.hr_data.test_ansatte_direktoratet`
+        FROM `${Config.ANSATTE_TABELL}`
         GROUP BY kjonn
     """.trimIndent()
 
@@ -45,7 +46,7 @@ fun hentKjonnPerAvdeling(projectId: String): List<DepartmentGenderCount> {
 
     val query = """
         SELECT organisasjon_avdeling, kjonn, COUNT(*) AS antall
-        FROM `heda-prod-2664.hr_data.test_ansatte_direktoratet`
+        FROM `${Config.ANSATTE_TABELL}`
         GROUP BY organisasjon_avdeling, kjonn
     """.trimIndent()
 
@@ -80,7 +81,7 @@ fun hentAldersgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAlderKjonn
 
     val query = """
         SELECT organisasjon_avdeling, aldersgruppe, kjonn, COUNT(*) AS antall
-        FROM `heda-prod-2664.hr_data.test_ansatte_direktoratet`
+        FROM `${Config.ANSATTE_TABELL}`
         GROUP BY organisasjon_avdeling, aldersgruppe, kjonn
     """.trimIndent()
 
