@@ -11,6 +11,7 @@ import no.nav.services.hentAldersgruppeKjonnPerAvdeling
 import no.nav.services.hentAnsiennnitetsgruppeKjonnPerAvdeling
 import no.nav.services.hentAldersgruppeKjonnPerSeksjon
 import no.nav.services.hentKjonnPerSeksjon
+import no.nav.services.hentKjonnPerRolle
 import no.nav.models.GenderStatsResponse
 import no.nav.models.GenderCount
 import no.nav.models.DepartmentGenderCount
@@ -106,6 +107,19 @@ fun Application.genderRoutes() {
                     HttpStatusCode.InternalServerError,
                     "Feil i fender-age-per-section: ${e.message}"
                 )
+            }
+        }
+
+        get("/gender-per-role") {
+            logger.info("Kaller hentKjonnPerRolle")
+            try {
+                val result = hentKjonnPerRolle(projectId)
+                call.respond(result)
+            } catch (e: Exception) {
+                logger.error("Feil i gender-per-role", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Feil i gender-per-role: ${e.message}")
             }
         }
     }
