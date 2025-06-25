@@ -8,9 +8,13 @@ import org.slf4j.LoggerFactory
 import no.nav.services.hentTotalKjonnStatistikk
 import no.nav.services.hentKjonnPerAvdeling
 import no.nav.services.hentAldersgruppeKjonnPerAvdeling
+import no.nav.services.hentAnsiennnitetsgruppeKjonnPerAvdeling
+import no.nav.services.hentAldersgruppeKjonnPerSeksjon
+import no.nav.services.hentKjonnPerSeksjon
 import no.nav.models.GenderStatsResponse
 import no.nav.models.GenderCount
 import no.nav.models.DepartmentGenderCount
+import no.nav.models.SeksjonKjonnCount
 
 fun Application.genderRoutes() {
     val logger = LoggerFactory.getLogger("GenderRoutes")
@@ -64,5 +68,45 @@ fun Application.genderRoutes() {
                 )
             }
         }
-    }   
+
+        get("/gender-seniority-per-department") {
+            logger.info("Kaller hentAnsiennnitetsgruppeKjonnPerAvdeling")
+            try {
+                val result = hentAnsiennnitetsgruppeKjonnPerAvdeling(projectId)
+                call.respond(result)
+            } catch (e: Exception) {
+                logger.error("Feil i gender-seniority-per-department", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Feil i gender-seniority-per-department: ${e.message}")
+            } 
+        }
+
+        get("/gender-per-section") {
+            logger.info("Kaller hentKjonnPerSeksjon")
+            try {
+                val result = hentKjonnPerSeksjon(projectId)
+                call.respond(result)
+            } catch (e: Exception) {
+                logger.error("Feil i gender-per-section", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Feil i  gender-per-section: ${e.message}")
+            }
+        }
+
+        get("/gender-age-per-section") {
+            logger.info("Kaller hentAldersgruppeKjonnPerSeksjon")
+            try {
+                val result = hentAldersgruppeKjonnPerSeksjon(projectId)
+                call.respond(result)
+            } catch (e: Exception) {
+                logger.error("Feil i gender-age-per-section", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Feil i fender-age-per-section: ${e.message}"
+                )
+            }
+        }
+    }
 }
