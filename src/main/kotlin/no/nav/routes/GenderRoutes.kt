@@ -12,6 +12,7 @@ import no.nav.services.hentAnsiennnitetsgruppeKjonnPerAvdeling
 import no.nav.services.hentAldersgruppeKjonnPerSeksjon
 import no.nav.services.hentKjonnPerSeksjon
 import no.nav.services.hentKjonnPerRolle
+import no.nav.services.hentKjonnPerLederniva
 import no.nav.models.GenderStatsResponse
 import no.nav.models.GenderCount
 import no.nav.models.DepartmentGenderCount
@@ -120,6 +121,19 @@ fun Application.genderRoutes() {
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     "Feil i gender-per-role: ${e.message}")
+            }
+        }
+
+        get("/gender-per-leader-level") {
+            logger.info("Kaller hentKjonnPerLederniva")
+            try {
+                val result = hentKjonnPerLederniva(projectId)
+                call.respond(result)
+            } catch (e: Exception) {
+                logger.error("Feil i gender-per-leader-level", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Feil i gender-per-leader-level: ${e.message}")
             }
         }
     }

@@ -11,6 +11,7 @@ import no.nav.models.AvdelingAnsiennitetKjonnCount
 import no.nav.models.SeksjonKjonnCount
 import no.nav.models.SeksjonAlderKjonnCount
 import no.nav.models.RolleKjonnCount
+import no.nav.models.LedernivaKjonnCount
 import no.nav.Config
 
 fun hentTotalKjonnStatistikk(projectId: String): Map<String, Long> {
@@ -255,6 +256,40 @@ fun hentKjonnPerRolle(projectId: String): List<RolleKjonnCount> {
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
             RolleKjonnCount(
                 rolle = rolle,
+                kvinne = kjonnMap["kvinne"] ?: 0,
+                mann = kjonnMap["mann"] ?: 0
+            )
+        }
+}
+
+fun hentKjonnPerLederniva(projectId: String): List<LedernivaKjonnCount> {
+    val bigquery = BigQueryOptions.getDefaultInstance().service
+
+    val query = """
+        SELECT lederniva, kjonn, COUNT(*) AS antall
+        FROM `${Config.ANSATTE_TABELL}`
+        GROUP BY lederniva, kjonn
+    """.trimIndent()
+
+    val queryConfig = QueryJobConfiguration.newBuilder(query)
+        .setUseLegacySql(false)
+        .build()
+
+    val jobId = JobId.of(projectId, UUID.randomUUID().toString())
+    val queryJob = bigquery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build()).waitFor()
+
+    if (queryJob == null || queryJob.status.error != null) {
+        throw RuntimeException("Query failed: ${queryJob?.status?.error}")
+    }
+
+    val results = queryJob.getQueryResults()
+
+    return results.iterateAll()
+        .groupBy { it["lederniva"].stringValue }
+        .map { (nivaa, rows) ->
+            val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
+            LedernivaKjonnCount(
+                lederNiva = nivaa,
                 kvinne = kjonnMap["kvinne"] ?: 0,
                 mann = kjonnMap["mann"] ?: 0
             )
