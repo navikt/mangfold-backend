@@ -17,5 +17,7 @@ fun Application.KjonnRoutes() {
         kjonnLedernivaRoutes(projectId, logger)
         kjonnAldersgruppeRoutes(projectId, logger)
         kjonnAnsiennitetsgruppeRoutes(projectId, logger)
+        aldersgruppePerRolle(projectId, logger)
+        
     }
 }
