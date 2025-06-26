@@ -1,10 +1,10 @@
 package no.nav.services
 
-import no.nav.modeller.SeksjonKjonnAntall
-import no.nav.modeller.SeksjonAlderKjonnAntall
+import no.nav.modeller.KjonnGruppeAntall
+import no.nav.modeller.ToGrupperKjonnAntall
 import no.nav.Konfig
 
-fun hentKjonnPerSeksjon(prosjektId: String): List<SeksjonKjonnAntall> {
+fun hentKjonnPerSeksjon(prosjektId: String): List<KjonnGruppeAntall> {
     val query = """
         SELECT organisasjon_seksjon, kjonn, COUNT(*) AS antall
         FROM `${Konfig.ANSATTE_TABELL}`
@@ -14,15 +14,14 @@ fun hentKjonnPerSeksjon(prosjektId: String): List<SeksjonKjonnAntall> {
     return rows.groupBy { it["organisasjon_seksjon"].stringValue }
         .map { (seksjon, groupRows) ->
             val kjonnMap = groupRows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            SeksjonKjonnAntall(
-                seksjon = seksjon,
-                kvinne = kjonnMap["kvinne"] ?: 0,
-                mann = kjonnMap["mann"] ?: 0
+            KjonnGruppeAntall(
+                gruppe = seksjon,
+                kjonnAntall = kjonnMap
             )
         }
 }
 
-fun hentAldersgruppeKjonnPerSeksjon(prosjektId: String): List<SeksjonAlderKjonnAntall> {
+fun hentAldersgruppeKjonnPerSeksjon(prosjektId: String): List<ToGrupperKjonnAntall> {
     val query = """
         SELECT organisasjon_seksjon, aldersgruppe, kjonn, COUNT(*) AS antall
         FROM `${Konfig.ANSATTE_TABELL}`
@@ -36,11 +35,10 @@ fun hentAldersgruppeKjonnPerSeksjon(prosjektId: String): List<SeksjonAlderKjonnA
         }
         .map { (pair, groupRows) ->
             val kjonnMap = groupRows.associate { (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue }
-            SeksjonAlderKjonnAntall(
-                seksjon = pair.first,
-                aldersgruppe = pair.second,
-                kvinne = kjonnMap["kvinne"] ?: 0,
-                mann = kjonnMap["mann"] ?: 0
+            ToGrupperKjonnAntall(
+                gruppe1 = pair.first,
+                gruppe2 = pair.second,
+                kjonnAntall = kjonnMap
             )
         }
 }

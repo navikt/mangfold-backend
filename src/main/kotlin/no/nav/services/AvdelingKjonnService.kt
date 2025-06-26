@@ -1,11 +1,10 @@
 package no.nav.services
 
-import no.nav.modeller.AvdelingKjonnAntall
-import no.nav.modeller.AvdelingAlderKjonnAntall
-import no.nav.modeller.AvdelingAnsiennitetKjonnAntall
+import no.nav.modeller.KjonnGruppeAntall
+import no.nav.modeller.ToGrupperKjonnAntall
 import no.nav.Konfig
 
-fun hentKjonnPerAvdeling(prosjektId: String): List<AvdelingKjonnAntall> {
+fun hentKjonnPerAvdeling(prosjektId: String): List<KjonnGruppeAntall> {
     val query = """
         SELECT organisasjon_avdeling, kjonn, COUNT(*) AS antall
         FROM `${Konfig.ANSATTE_TABELL}`
@@ -15,15 +14,14 @@ fun hentKjonnPerAvdeling(prosjektId: String): List<AvdelingKjonnAntall> {
     return rows.groupBy { it["organisasjon_avdeling"].stringValue }
         .map { (avdeling, groupRows) ->
             val kjonnMap = groupRows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            AvdelingKjonnAntall(
-                avdeling = avdeling,
-                kvinne = kjonnMap["kvinne"] ?: 0,
-                mann = kjonnMap["mann"] ?: 0
+            KjonnGruppeAntall(
+                gruppe = avdeling,
+                kjonnAntall = kjonnMap
             )
         }
 }
 
-fun hentAldersgruppeKjonnPerAvdeling(prosjektId: String): List<AvdelingAlderKjonnAntall> {
+fun hentAldersgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
     val query = """
         SELECT organisasjon_avdeling, aldersgruppe, kjonn, COUNT(*) AS antall
         FROM `${Konfig.ANSATTE_TABELL}`
@@ -37,16 +35,15 @@ fun hentAldersgruppeKjonnPerAvdeling(prosjektId: String): List<AvdelingAlderKjon
         }
         .map { (pair, groupRows) ->
             val kjonnMap = groupRows.associate { (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue }
-            AvdelingAlderKjonnAntall(
-                avdeling = pair.first,
-                aldersgruppe = pair.second,
-                kvinne = kjonnMap["kvinne"] ?: 0,
-                mann = kjonnMap["mann"] ?: 0,
-            )
+        ToGrupperKjonnAntall(
+            gruppe1 = pair.first,
+            gruppe2 = pair.second,
+            kjonnAntall = kjonnMap
+        )
         }
 }
 
-fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<AvdelingAnsiennitetKjonnAntall> {
+fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
     val query = """
         SELECT organisasjon_avdeling, ansiennitetsgruppe, kjonn, COUNT(*) AS antall
         FROM `${Konfig.ANSATTE_TABELL}`
@@ -60,11 +57,10 @@ fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<AvdelingAn
         }
         .map { (pair, groupRows) ->
             val kjonnMap = groupRows.associate { (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue }
-            AvdelingAnsiennitetKjonnAntall(
-                avdeling = pair.first,
-                ansiennitetsgruppe = pair.second,
-                kvinne = kjonnMap["kvinne"] ?: 0,
-                mann = kjonnMap["mann"] ?: 0
+            ToGrupperKjonnAntall(
+                gruppe1 = pair.first,
+                gruppe2 = pair.second,
+                kjonnAntall = kjonnMap
             )
         }
 }

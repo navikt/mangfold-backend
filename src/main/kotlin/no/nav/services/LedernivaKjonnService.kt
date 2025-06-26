@@ -1,9 +1,9 @@
 package no.nav.services
 
-import no.nav.modeller.LedernivaKjonnAntall
+import no.nav.modeller.KjonnGruppeAntall
 import no.nav.Konfig
 
-fun hentKjonnPerLederniva(prosjektId: String): List<LedernivaKjonnAntall> {
+fun hentKjonnPerLederniva(prosjektId: String): List<KjonnGruppeAntall> {
     val query = """
         SELECT lederniva, kjonn, COUNT(*) AS antall
         FROM `${Konfig.ANSATTE_TABELL}`
@@ -11,12 +11,11 @@ fun hentKjonnPerLederniva(prosjektId: String): List<LedernivaKjonnAntall> {
     """.trimIndent()
     val rows = runBigQuery(query, prosjektId)
     return rows.groupBy { it["lederniva"].stringValue }
-        .map { (nivaa, groupRows) ->
+        .map { (lederniva, groupRows) ->
             val kjonnMap = groupRows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            LedernivaKjonnAntall(
-                lederNiva = nivaa,
-                kvinne = kjonnMap["kvinne"] ?: 0,
-                mann = kjonnMap["mann"] ?: 0
+            KjonnGruppeAntall(
+                gruppe = lederniva,
+                kjonnAntall = kjonnMap
             )
         }
 }

@@ -1,9 +1,9 @@
 package no.nav.services
 
-import no.nav.modeller.AldersgruppeKjonnAntall
+import no.nav.modeller.KjonnGruppeAntall
 import no.nav.Konfig
 
-fun hentKjonnPerAldersgruppe(prosjektId: String): List<AldersgruppeKjonnAntall> {
+fun hentKjonnPerAldersgruppe(prosjektId: String): List<KjonnGruppeAntall> {
     val query = """
         SELECT aldersgruppe, kjonn, COUNT(*) AS antall
         FROM `${Konfig.ANSATTE_TABELL}`
@@ -13,10 +13,9 @@ fun hentKjonnPerAldersgruppe(prosjektId: String): List<AldersgruppeKjonnAntall> 
     return rows.groupBy { it["aldersgruppe"].stringValue }
         .map { (aldersgruppe, groupRows) ->
             val kjonnMap = groupRows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            AldersgruppeKjonnAntall(
-                aldersgruppe = aldersgruppe,
-                kvinne = kjonnMap["kvinne"] ?: 0,
-                mann = kjonnMap["mann"] ?: 0
+            KjonnGruppeAntall(
+                gruppe = aldersgruppe,
+                kjonnAntall = kjonnMap
             )
         }
 }
