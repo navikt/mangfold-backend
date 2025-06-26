@@ -1,10 +1,10 @@
-package no.nav.models
+package no.nav.modeller
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DepartmentGenderCount(
-    val avdeling: String,
+data class SeksjonKjonnAntall(
+    val seksjon: String,
     val kvinne: Long,
     val mann: Long
 )

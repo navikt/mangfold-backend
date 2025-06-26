@@ -5,55 +5,53 @@ import com.google.cloud.bigquery.QueryJobConfiguration
 import com.google.cloud.bigquery.JobId
 import com.google.cloud.bigquery.JobInfo
 import java.util.*
-import no.nav.models.DepartmentGenderCount
-import no.nav.models.AvdelingAlderKjonnCount
-import no.nav.models.AvdelingAnsiennitetKjonnCount
-import no.nav.models.SeksjonKjonnCount
-import no.nav.models.SeksjonAlderKjonnCount
-import no.nav.models.RolleKjonnCount
-import no.nav.models.LedernivaKjonnCount
-import no.nav.models.AldersgruppeKjonnCount
-import no.nav.models.AnsiennitetsgruppeKjonnCount
-import no.nav.Config
+import no.nav.modeller.AvdelingKjonnAntall
+import no.nav.modeller.AvdelingAlderKjonnAntall
+import no.nav.modeller.AvdelingAnsiennitetKjonnAntall
+import no.nav.modeller.SeksjonKjonnAntall
+import no.nav.modeller.SeksjonAlderKjonnAntall
+import no.nav.modeller.RolleKjonnAntall
+import no.nav.modeller.LedernivaKjonnAntall
+import no.nav.modeller.AldersgruppeKjonnAntall
+import no.nav.modeller.AnsiennitetsgruppeKjonnAntall
+import no.nav.modeller.KjonnAntall
+import no.nav.Konfig
 
-fun hentTotalKjonnStatistikk(projectId: String): Map<String, Long> {
+fun hentTotalKjonnStatistikk(prosjektId: String): List<KjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
-    val query = """
+    val spørring = """
         SELECT kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY kjonn
     """.trimIndent()
 
-    val queryConfig = QueryJobConfiguration.newBuilder(query)
+    val queryConfig = QueryJobConfiguration.newBuilder(spørring)
         .setUseLegacySql(false)
         .build()
 
-    val jobId = JobId.of(projectId, UUID.randomUUID().toString())
+    val jobId = JobId.of(prosjektId, UUID.randomUUID().toString())
     val queryJob = bigquery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build()).waitFor()
 
     if (queryJob == null || queryJob.status.error != null) {
-        throw RuntimeException("Query failed: ${queryJob?.status?.error}")
+        throw RuntimeException("Spørring feilet: ${queryJob?.status?.error}")
     }
 
-    val results = queryJob.getQueryResults()
-    val output = mutableMapOf<String, Long>()
-
-    for (row in results.iterateAll()) {
-        val kjonn = row["kjonn"].stringValue.lowercase()
-        val antall = row["antall"].longValue
-        output[kjonn] = antall
+    val resultater = queryJob.getQueryResults()
+    return resultater.iterateAll().map { rad ->
+        KjonnAntall(
+            kjonn = rad["kjonn"].stringValue.lowercase(),
+            antall = rad["antall"].longValue
+        )
     }
-
-    return output
 }
 
-fun hentKjonnPerAvdeling(projectId: String): List<DepartmentGenderCount> {
+fun hentKjonnPerAvdeling(projectId: String): List<AvdelingKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT organisasjon_avdeling, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY organisasjon_avdeling, kjonn
     """.trimIndent()
 
@@ -74,7 +72,7 @@ fun hentKjonnPerAvdeling(projectId: String): List<DepartmentGenderCount> {
         .groupBy { it["organisasjon_avdeling"].stringValue }
         .map { (avdeling, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            DepartmentGenderCount(
+            AvdelingKjonnAntall(
                 avdeling = avdeling,
                 kvinne = kjonnMap["kvinne"] ?: 0,
                 mann = kjonnMap["mann"] ?: 0
@@ -83,12 +81,12 @@ fun hentKjonnPerAvdeling(projectId: String): List<DepartmentGenderCount> {
     return grouped
 }
 
-fun hentAldersgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAlderKjonnCount> {
+fun hentAldersgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAlderKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT organisasjon_avdeling, aldersgruppe, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY organisasjon_avdeling, aldersgruppe, kjonn
     """.trimIndent()
 
@@ -115,7 +113,7 @@ fun hentAldersgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAlderKjonn
             val kjonnMap = rows.associate { 
                 (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue 
             }
-            AvdelingAlderKjonnCount(
+            AvdelingAlderKjonnAntall(
                 avdeling = pair.first,
                 aldersgruppe = pair.second,
                 kvinne = kjonnMap["kvinne"] ?: 0,
@@ -125,12 +123,12 @@ fun hentAldersgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAlderKjonn
     return grouped
 }
 
-fun hentAnsiennnitetsgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAnsiennitetKjonnCount> {
+fun hentAnsiennnitetsgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAnsiennitetKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT organisasjon_avdeling, ansiennitetsgruppe, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY organisasjon_avdeling, ansiennitetsgruppe, kjonn
     """.trimIndent()
 
@@ -151,7 +149,7 @@ fun hentAnsiennnitetsgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAns
         .groupBy { it["organisasjon_avdeling"].stringValue }
         .map { (avdeling, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            AvdelingAnsiennitetKjonnCount(
+            AvdelingAnsiennitetKjonnAntall(
                 avdeling = avdeling,
                 ansiennitetsgruppe = rows.first()["ansiennitetsgruppe"].stringValue,
                 kvinne = kjonnMap["kvinne"] ?: 0,
@@ -161,12 +159,12 @@ fun hentAnsiennnitetsgruppeKjonnPerAvdeling(projectId: String): List<AvdelingAns
     return grouped
 }
 
-fun hentKjonnPerSeksjon(projectId: String): List<SeksjonKjonnCount> {
+fun hentKjonnPerSeksjon(projectId: String): List<SeksjonKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT organisasjon_seksjon, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY organisasjon_seksjon, kjonn
     """.trimIndent()
 
@@ -187,7 +185,7 @@ fun hentKjonnPerSeksjon(projectId: String): List<SeksjonKjonnCount> {
         .groupBy { it["organisasjon_seksjon"].stringValue }
         .map { (seksjon, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            SeksjonKjonnCount(
+            SeksjonKjonnAntall(
                 seksjon = seksjon,
                 kvinne = kjonnMap["kvinne"] ?: 0,
                 mann = kjonnMap["mann"] ?: 0
@@ -195,12 +193,12 @@ fun hentKjonnPerSeksjon(projectId: String): List<SeksjonKjonnCount> {
         }
 }
 
-fun hentAldersgruppeKjonnPerSeksjon(projectId: String): List<SeksjonAlderKjonnCount> {
+fun hentAldersgruppeKjonnPerSeksjon(projectId: String): List<SeksjonAlderKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT organisasjon_seksjon, aldersgruppe, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY organisasjon_seksjon, aldersgruppe, kjonn
     """.trimIndent()
 
@@ -221,7 +219,7 @@ fun hentAldersgruppeKjonnPerSeksjon(projectId: String): List<SeksjonAlderKjonnCo
         .groupBy { it["organisasjon_seksjon"].stringValue }
         .map { (seksjon, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            SeksjonAlderKjonnCount(
+            SeksjonAlderKjonnAntall(
                 seksjon = seksjon,
                 aldersgruppe = rows.first()["aldersgruppe"].stringValue,
                 kvinne = kjonnMap["kvinne"] ?: 0,
@@ -230,13 +228,13 @@ fun hentAldersgruppeKjonnPerSeksjon(projectId: String): List<SeksjonAlderKjonnCo
         }
 }
 
-fun hentKjonnPerRolle(projectId: String): List<RolleKjonnCount> {
+fun hentKjonnPerRolle(projectId: String): List<RolleKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
-        SELECT stillingsnavn, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
-        GROUP BY stillingsnavn, kjonn
+        SELECT rolle, kjonn, COUNT(*) AS antall
+        FROM `${Konfig.ANSATTE_TABELL}`
+        GROUP BY rolle, kjonn
     """.trimIndent()
 
     val queryConfig = QueryJobConfiguration.newBuilder(query)
@@ -253,10 +251,10 @@ fun hentKjonnPerRolle(projectId: String): List<RolleKjonnCount> {
     val results = queryJob.getQueryResults()
 
     return results.iterateAll()
-        .groupBy { it["stillingsnavn"].stringValue }
+        .groupBy { it["rolle"].stringValue }
         .map { (rolle, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            RolleKjonnCount(
+            RolleKjonnAntall(
                 rolle = rolle,
                 kvinne = kjonnMap["kvinne"] ?: 0,
                 mann = kjonnMap["mann"] ?: 0
@@ -264,12 +262,12 @@ fun hentKjonnPerRolle(projectId: String): List<RolleKjonnCount> {
         }
 }
 
-fun hentKjonnPerLederniva(projectId: String): List<LedernivaKjonnCount> {
+fun hentKjonnPerLederniva(projectId: String): List<LedernivaKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT lederniva, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY lederniva, kjonn
     """.trimIndent()
 
@@ -290,7 +288,7 @@ fun hentKjonnPerLederniva(projectId: String): List<LedernivaKjonnCount> {
         .groupBy { it["lederniva"].stringValue }
         .map { (nivaa, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            LedernivaKjonnCount(
+            LedernivaKjonnAntall(
                 lederNiva = nivaa,
                 kvinne = kjonnMap["kvinne"] ?: 0,
                 mann = kjonnMap["mann"] ?: 0
@@ -298,12 +296,12 @@ fun hentKjonnPerLederniva(projectId: String): List<LedernivaKjonnCount> {
         }
 }
 
-fun hentKjonnPerAldersgruppe(projectId: String): List<AldersgruppeKjonnCount> {
+fun hentKjonnPerAldersgruppe(projectId: String): List<AldersgruppeKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT aldersgruppe, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY aldersgruppe, kjonn
     """.trimIndent()
 
@@ -324,7 +322,7 @@ fun hentKjonnPerAldersgruppe(projectId: String): List<AldersgruppeKjonnCount> {
         .groupBy { it["aldersgruppe"].stringValue }
         .map { (aldersgruppe, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            AldersgruppeKjonnCount(
+            AldersgruppeKjonnAntall(
                 aldersgruppe = aldersgruppe,
                 kvinne = kjonnMap["kvinne"] ?: 0,
                 mann = kjonnMap["mann"] ?: 0
@@ -332,12 +330,12 @@ fun hentKjonnPerAldersgruppe(projectId: String): List<AldersgruppeKjonnCount> {
         }
 }
 
-fun hentKjonnPerAnsiennitetsgruppe(projectId: String): List<AldersgruppeKjonnCount> {
+fun hentKjonnPerAnsiennitetsgruppe(projectId: String): List<AnsiennitetsgruppeKjonnAntall> {
     val bigquery = BigQueryOptions.getDefaultInstance().service
 
     val query = """
         SELECT ansiennitetsgruppe, kjonn, COUNT(*) AS antall
-        FROM `${Config.ANSATTE_TABELL}`
+        FROM `${Konfig.ANSATTE_TABELL}`
         GROUP BY ansiennitetsgruppe, kjonn
     """.trimIndent()
 
@@ -356,10 +354,10 @@ fun hentKjonnPerAnsiennitetsgruppe(projectId: String): List<AldersgruppeKjonnCou
 
     return results.iterateAll()
         .groupBy { it["ansiennitetsgruppe"].stringValue }
-        .map { (ansiennitet, rows) ->
+        .map { (ansiennitetsgruppe, rows) ->
             val kjonnMap = rows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
-            AldersgruppeKjonnCount(
-                aldersgruppe = ansiennitet,
+            AnsiennitetsgruppeKjonnAntall(
+                ansiennitetsgruppe = ansiennitetsgruppe,
                 kvinne = kjonnMap["kvinne"] ?: 0,
                 mann = kjonnMap["mann"] ?: 0
             )

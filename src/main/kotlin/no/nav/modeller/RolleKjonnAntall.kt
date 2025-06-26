@@ -1,10 +1,11 @@
-package no.nav.models
+package no.nav.modeller
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LedernivaKjonnCount(
-    val lederNiva: String,
+data class RolleKjonnAntall(
+    val rolle: String,
     val kvinne: Long,
     val mann: Long
 )
+

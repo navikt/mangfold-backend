@@ -1,9 +1,9 @@
-package no.nav.models
+package no.nav.modeller
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AnsiennitetsgruppeKjonnCount(
-    val ansiennitetsgruppe: String,
+data class AldersgruppeKjonnAntall (
+    val aldersgruppe: String,
     val kvinne: Long,
     val mann: Long
 )
