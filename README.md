@@ -49,33 +49,39 @@ Serveren vil som standard lytte på port 8080.
 
 Her er en oversikt over tilgjengelige endepunkter (alle returnerer aggregerte tall per kjønn):
 
+### Total statistikk
 - `GET /kjonn-statistikk`  
   Total kjønnsfordeling (hele NAV).
 
+### Avdelingsrelaterte endepunkter
 - `GET /kjonn-per-avdeling`  
   Kjønnsfordeling per avdeling.
-
 - `GET /alder-kjonn-per-avdeling`  
   Kjønnsfordeling per avdeling og aldersgruppe.
-
 - `GET /ansiennitet-kjonn-per-avdeling`  
   Kjønnsfordeling per avdeling og ansiennitetsgruppe.
 
+### Seksjonsrelaterte endepunkter
 - `GET /kjonn-per-seksjon`  
   Kjønnsfordeling per seksjon.
-
 - `GET /alder-kjonn-per-seksjon`  
   Kjønnsfordeling per seksjon og aldersgruppe.
+- `GET /ansiennitet-kjonn-per-seksjon`  
+  Kjønnsfordeling per seksjon og ansiennitetsgruppe.
+- `GET /lederniva-kjonn-per-seksjon`  
+  Kjønnsfordeling per seksjon og ledernivå.
 
+### Rolle og ledernivå
 - `GET /kjonn-per-rolle`  
   Kjønnsfordeling per rolle/stillingsnavn.
-
+- `GET /aldersgruppe-per-rolle`  
+  Kjønnsfordeling per rolle og aldersgruppe.
 - `GET /kjonn-per-lederniva`  
   Kjønnsfordeling per ledernivå.
 
+### Alders- og ansiennitetsgrupper
 - `GET /kjonn-per-aldersgruppe`  
   Kjønnsfordeling per aldersgruppe (på tvers av organisasjonen).
-
 - `GET /kjonn-per-ansiennitetsgruppe`  
   Kjønnsfordeling per ansiennitetsgruppe (på tvers av organisasjonen).
 

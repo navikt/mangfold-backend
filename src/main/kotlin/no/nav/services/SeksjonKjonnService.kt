@@ -42,3 +42,53 @@ fun hentAldersgruppeKjonnPerSeksjon(prosjektId: String): List<ToGrupperKjonnAnta
             )
         }
 }
+
+fun hentAnsiennitetsgruppeKjonnPerSeksjon(prosjektId: String): List<ToGrupperKjonnAntall> {
+    val query = """
+        SELECT organisasjon_seksjon, ansiennitetsgruppe, kjonn, COUNT(*) AS antall
+        FROM `${Konfig.ANSATTE_TABELL}`
+        GROUP BY organisasjon_seksjon, ansiennitetsgruppe, kjonn
+    """.trimIndent()
+    
+    val rows = runBigQuery(query, prosjektId)
+    return rows.groupBy { 
+            val seksjon = it["organisasjon_seksjon"]?.stringValue ?: "Ukjent"
+            val ansiennitet = it["ansiennitetsgruppe"]?.stringValue ?: "Ukjent"
+            seksjon to ansiennitet
+        }
+        .map { (pair, groupRows) ->
+            val kjonnMap = groupRows.associate { 
+                (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue 
+            }
+            ToGrupperKjonnAntall(
+                gruppe1 = pair.first,
+                gruppe2 = pair.second,
+                kjonnAntall = kjonnMap
+            )
+        }
+}
+
+fun hentLedernivaKjonnPerSeksjon(prosjektId: String): List<ToGrupperKjonnAntall> {
+    val query = """
+        SELECT organisasjon_seksjon, lederniva, kjonn, COUNT(*) AS antall
+        FROM `${Konfig.ANSATTE_TABELL}`
+        GROUP BY organisasjon_seksjon, lederniva, kjonn
+    """.trimIndent()
+    
+    val rows = runBigQuery(query, prosjektId)
+    return rows.groupBy { 
+            val seksjon = it["organisasjon_seksjon"]?.stringValue ?: "Ukjent"
+            val lederniva = it["lederniva"]?.stringValue ?: "Ukjent"
+            seksjon to lederniva
+        }
+        .map { (pair, groupRows) ->
+            val kjonnMap = groupRows.associate { 
+                (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue 
+            }
+            ToGrupperKjonnAntall(
+                gruppe1 = pair.first,
+                gruppe2 = pair.second,
+                kjonnAntall = kjonnMap
+            )
+        }
+}
