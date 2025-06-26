@@ -14,6 +14,7 @@ import no.nav.services.hentKjonnPerSeksjon
 import no.nav.services.hentKjonnPerRolle
 import no.nav.services.hentKjonnPerLederniva
 import no.nav.services.hentKjonnPerAldersgruppe
+import no.nav.services.hentKjonnPerAnsiennitetsgruppe
 import no.nav.models.GenderStatsResponse
 import no.nav.models.GenderCount
 import no.nav.models.DepartmentGenderCount
@@ -148,6 +149,20 @@ fun Application.genderRoutes() {
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     "Feil i gender-per-age-group: ${e.message}"
+                )
+            }
+        }
+
+        get("/gender-per-seniority-group") {
+            logger.info("Kaller hentKjonnPerAnsiennitetsgruppe")
+            try {
+                val result = hentKjonnPerAnsiennitetsgruppe(projectId)
+                call.respond(result)
+            } catch (e: Exception) {
+                logger.error("Feil i gender-per-seniority-group", e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Feil i gender-per-seniority-group: ${e.message}"
                 )
             }
         }
