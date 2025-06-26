@@ -5,7 +5,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import no.nav.routes.genderRoutes
+import no.nav.routes.KjonnRoutes
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -16,5 +16,5 @@ fun Application.module() {
         })
     }
 
-    genderRoutes()
+    KjonnRoutes()
 }
