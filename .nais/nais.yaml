@@ -10,7 +10,7 @@ spec:
 
   gcp:
     bigQueryDatasets:
-      - name: heda-prod-2664.hr_data.test_ansatte_direktoratet
+      - name: hr_data.test_ansatte_direktoratet
         permission: READ  # Removed the projectId field as it's not supported
 
   ingresses:
