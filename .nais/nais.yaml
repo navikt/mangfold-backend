@@ -1,11 +1,21 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: mangfold  # TODO: Change this name to your application name
+  name: mangfold-backend  # TODO: Change this name to your application name
   namespace: heda # TODO: Change this to your team's namespace
 spec:
+  env: 
+    - name: BIGQUERY_PROJECT_ID
+      value: "heda-prod-2664"
+
+  gcp:
+    bigQueryDatasets:
+      - name: heda-prod-2664.hr_data.test_ansatte_direktoratet
+        projectId: heda-prod-2664
+        permission: READ
+
   ingresses:
-    - https://backend-golden-path.intern.dev.nav.no # TODO: Change this to your desired ingress
+    - https://mangfold-backend.intern.dev.nav.no
   image: {{image}}
   port: 8080
   replicas:

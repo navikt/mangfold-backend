@@ -10,11 +10,16 @@ import no.nav.routes.KjonnRoutes
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
+    val config = environment.config
+    val projectId = config.propertyOrNull("bigquery.projectId")?.getString()
+        ?: System.getenv("BIGQUERY_PROJECT_ID")
+        ?: throw IllegalStateException("BIGQUERY_PROJECT_ID må settes")
+
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
         })
     }
 
-    KjonnRoutes()
+    KjonnRoutes(projectId)
 }
