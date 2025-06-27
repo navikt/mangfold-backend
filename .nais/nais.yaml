@@ -10,8 +10,8 @@ spec:
 
   gcp:
     bigQueryDatasets:
-      - name: hr_data.test_ansatte_direktoratet
-        permission: READ  # Removed the projectId field as it's not supported
+      - name: hr_data
+        permission: READ
 
   ingresses:
     - https://mangfold-backend.intern.dev.nav.no
