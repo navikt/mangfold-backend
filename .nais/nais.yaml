@@ -11,8 +11,7 @@ spec:
   gcp:
     bigQueryDatasets:
       - name: heda-prod-2664.hr_data.test_ansatte_direktoratet
-        projectId: heda-prod-2664
-        permission: READ
+        permission: READ  # Removed the projectId field as it's not supported
 
   ingresses:
     - https://mangfold-backend.intern.dev.nav.no
