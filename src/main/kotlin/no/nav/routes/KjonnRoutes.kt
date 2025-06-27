@@ -4,10 +4,8 @@ import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import org.slf4j.LoggerFactory
 
-fun Application.KjonnRoutes() {
-    val logger = LoggerFactory.getLogger("GenderRoutes")
-    val projectId = System.getenv("BIGQUERY_PROJECT_ID")
-        ?: throw IllegalStateException("BIGQUERY_PROJECT_ID må settes som miljøvariabel")
+fun Application.KjonnRoutes(projectId: String) {
+    val logger = LoggerFactory.getLogger("KjonnRoutes")
 
     routing {
         kjonnStatistikkRoutes(projectId, logger)
@@ -18,6 +16,5 @@ fun Application.KjonnRoutes() {
         kjonnAldersgruppeRoutes(projectId, logger)
         kjonnAnsiennitetsgruppeRoutes(projectId, logger)
         aldersgruppePerRolle(projectId, logger)
-        
     }
 }
