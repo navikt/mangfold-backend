@@ -29,7 +29,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-    implementation(platform("com.google.cloud:libraries-bom:26.45.0"))
+    implementation(platform("com.google.cloud:libraries-bom:26.62.0"))
     implementation("com.google.cloud:google-cloud-bigquery")
 
 
