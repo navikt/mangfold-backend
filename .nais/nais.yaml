@@ -9,8 +9,6 @@ spec:
       value: "heda-prod-2664"
 
   gcp:
-    serviceAccount:
-      email: heda-1c0e@knada-gcp.iam.gserviceaccount.com
     bigQueryDatasets:
       - name: hr_data
         permission: READ
