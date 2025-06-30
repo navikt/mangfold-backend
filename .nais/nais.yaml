@@ -15,6 +15,7 @@ spec:
 
   ingresses:
     - https://mangfold-backend.intern.dev.nav.no
+    - https://mangfold-backend.intern.nav.no #Kan velge å bytte intern til ansatt slik at alle ansatte får åpnet
   image: {{image}}
   port: 8080
   replicas:
