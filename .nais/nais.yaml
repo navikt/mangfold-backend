@@ -8,6 +8,7 @@ spec:
     - name: BIGQUERY_PROJECT_ID
       value: "heda-prod-2664"
 
+  googleServiceAccount: heda-1c0e@knada-gcp.iam.gserviceaccount.com
   gcp:
     bigQueryDatasets:
       - name: hr_data
