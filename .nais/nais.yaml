@@ -11,7 +11,7 @@ spec:
   gcp:
     bigQueryDatasets:
       - name: hr_data
-        # permission: READ
+        permission: READ
 
   ingresses:
     - https://mangfold-backend.intern.dev.nav.no
