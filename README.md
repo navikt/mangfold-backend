@@ -1,94 +1,109 @@
-# NAV Mangfolds-API
+# Mangfold Backend API
 
-Backend for levering av endepunkter for å hente og aggregere mangfoldsdata for ansatte i NAV (direktoratet/etaten), med fokus på kjønnsfordeling, aldersgrupper, ansiennitet og tilhørighet i organisasjonen. Data hentes fra BigQuery og eksponeres via REST-API-endepunkter i Ktor.
+## Om applikasjonen
+Backend-API for å hente mangfoldsdata fra NAV-direktoratet. Applikasjonen gir tilgang til statistikk om kjønnsfordeling på tvers av organisasjonen, inkludert avdelinger, seksjoner, roller og aldersgrupper.
 
-## Funksjonalitet
-- Henter aggregerte data om kjønnsfordeling, aldersgrupper og ansiennitet per avdeling, seksjon, rolle, ledernivå og andre grupperinger.
-- Tilrettelegger for visualisering av mangfold i NAV på gruppenivå – ingen identifiserende persondata eksponeres.
+## Teknisk oversikt
+- Kotlin/Ktor backend
+- Google BigQuery integrasjon
+- Deployet på NAIS-plattformen
 
-## Teknologi
-- [Ktor](https://ktor.io/) – Kotlin-basert webserver
-- [Google BigQuery](https://cloud.google.com/bigquery) – Datavarehus for HR-data
-- [Kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) – JSON-serialisering
-- [Gradle](https://gradle.org/) – Byggeverktøy
+## Oppsett for utvikling
 
-## Kjøring lokalt
+### Forutsetninger
+- Java 21
+- Gradle
+- Tilgang til NAV's Google Cloud Platform (prosjekt: heda-prod-2664)
+- Tilgang til NAIS
 
-1. **Forutsetninger:**
-    - Java 17+
-    - Tilgang til Google Cloud-prosjektet og BigQuery-tabellen
+### Lokal utvikling
 
-2. **Autentisering mot Google Cloud:**
+1. **Klon repoet**
+```bash
+git clone https://github.com/navikt/mangfold-backend.git
+cd mangfold-backend
+```
 
-   Du kan autentisere på to måter:
+2. **Autentiser mot Google Cloud**
+```bash
+# For BigQuery-tilgang
+gcloud auth application-default login
+```
 
-   - **Med service account-fil (anbefalt for produksjon):**
-     ```bash
-     export GOOGLE_APPLICATION_CREDENTIALS=/sti/til/service-account.json
-     ```
-   - **Med din egen Google-bruker (for lokal testing):**
-     ```bash
-     gcloud auth application-default login
-     unset GOOGLE_APPLICATION_CREDENTIALS
-     ```
+2. **Bygg og start applikasjonen:**
+```bash
+# Bygg prosjektet først
+./gradlew build
 
-3. **Sett prosjekt-ID for BigQuery:**
-   ```bash
-   export BIGQUERY_PROJECT_ID=nav-prosjekt-id
-   ```
+# Start applikasjonen
+./gradlew run
+```
 
-4. **Bygg og start server:**
-   ```bash
-   ./gradlew build
-   ./gradlew run
-   ```
+Applikasjonen vil være tilgjengelig på `http://localhost:8080`
 
-Serveren vil som standard lytte på port 8080.
+### Verifiser oppsett
+```bash
+curl http://localhost:8080/kjonn-statistikk
+```
 
 ## API-endepunkter
 
-Her er en oversikt over tilgjengelige endepunkter (alle returnerer aggregerte tall per kjønn):
-
 ### Total statistikk
-- `GET /kjonn-statistikk`  
-  Total kjønnsfordeling (hele NAV).
+```http
+GET /kjonn-statistikk
+Response:
+[
+  {
+    "kjonn": "kvinne",
+    "antall": 150
+  }
+]
+```
 
-### Avdelingsrelaterte endepunkter
-- `GET /kjonn-per-avdeling`  
-  Kjønnsfordeling per avdeling.
-- `GET /alder-kjonn-per-avdeling`  
-  Kjønnsfordeling per avdeling og aldersgruppe.
-- `GET /ansiennitet-kjonn-per-avdeling`  
-  Kjønnsfordeling per avdeling og ansiennitetsgruppe.
+### Avdelingsstatistikk
+```http
+GET /kjonn-per-avdeling
+Response:
+[
+  {
+    "gruppe": "IT",
+    "kjonnAntall": {
+      "kvinne": 100,
+      "mann": 200
+    }
+  }
+]
+```
 
-### Seksjonsrelaterte endepunkter
-- `GET /kjonn-per-seksjon`  
-  Kjønnsfordeling per seksjon.
-- `GET /alder-kjonn-per-seksjon`  
-  Kjønnsfordeling per seksjon og aldersgruppe.
-- `GET /ansiennitet-kjonn-per-seksjon`  
-  Kjønnsfordeling per seksjon og ansiennitetsgruppe.
-- `GET /lederniva-kjonn-per-seksjon`  
-  Kjønnsfordeling per seksjon og ledernivå.
+### Alle tilgjengelige endepunkter
+- `/kjonn-statistikk` - Total kjønnsfordeling
+- `/kjonn-per-avdeling` - Kjønnsfordeling per avdeling
+- `/alder-kjonn-per-avdeling` - Kjønn og alder per avdeling
+- `/ansiennitet-kjonn-per-avdeling` - Kjønn og ansiennitet per avdeling
+- `/kjonn-per-seksjon` - Kjønnsfordeling per seksjon
+- `/alder-kjonn-per-seksjon` - Kjønn og alder per seksjon
+- `/ansiennitet-kjonn-per-seksjon` - Kjønn og ansiennitet per seksjon
+- `/lederniva-kjonn-per-seksjon` - Kjønn og ledernivå per seksjon
+- `/kjonn-per-rolle` - Kjønnsfordeling per rolle
+- `/aldersgruppe-per-rolle` - Kjønn og alder per rolle
+- `/kjonn-per-lederniva` - Kjønnsfordeling per ledernivå
+- `/kjonn-per-aldersgruppe` - Kjønnsfordeling per aldersgruppe
+- `/kjonn-per-ansiennitetsgruppe` - Kjønnsfordeling per ansiennitetsgruppe
+- `/nyansatte-per-aar` - Statistikk over nyansettelser per år
 
-### Rolle og ledernivå
-- `GET /kjonn-per-rolle`  
-  Kjønnsfordeling per rolle/stillingsnavn.
-- `GET /aldersgruppe-per-rolle`  
-  Kjønnsfordeling per rolle og aldersgruppe.
-- `GET /kjonn-per-lederniva`  
-  Kjønnsfordeling per ledernivå.
+## Deployment
 
-### Alders- og ansiennitetsgrupper
-- `GET /kjonn-per-aldersgruppe`  
-  Kjønnsfordeling per aldersgruppe (på tvers av organisasjonen).
-- `GET /kjonn-per-ansiennitetsgruppe`  
-  Kjønnsfordeling per ansiennitetsgruppe (på tvers av organisasjonen).
+### NAIS
+Applikasjonen er deployet på NAIS og tilgjengelig på:
+- Prod: `https://mangfold-backend.intern.nav.no`
 
-## Videre arbeid
-- Flere variabler: lønn, etnisk bakgrunn, funksjonsvariasjoner m.m.
+**NB:** Krever tilkobling til NAV-nettverk (VPN)
 
-**Kontakt:**  
-Team Heda
+### Miljøvariabler
+- `BIGQUERY_PROJECT_ID`: Satt automatisk via NAIS
+- BigQuery-autentisering: Håndteres av Workload Identity i NAIS
+
+## Kontakt
+Team Heda - [#team-heda](https://nav-it.slack.com/archives/team-heda) på Slack
 
 
