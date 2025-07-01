@@ -1,10 +1,10 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: mangfold-backend  
+  name: mangfold-backend
   namespace: heda
 spec:
-  env: 
+  env:
     - name: BIGQUERY_PROJECT_ID
       value: "heda-prod-2664"
 
@@ -23,8 +23,11 @@ spec:
     min: 1
   resources:
     requests:
-      cpu: 50m
+      cpu: 10m
       memory: 32Mi
+    limits:
+      memory: 160Mi
+
   observability:
     logging:
       destinations:
