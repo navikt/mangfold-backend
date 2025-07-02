@@ -14,6 +14,15 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    # see https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/optimizing-pr-creation-version-updates#example-3-individual-pull-requests-for-major-updates-and-grouped-for-minorpatch-updates
+    groups:
+      github-actions-bump:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
 
   - package-ecosystem: gradle
     directory: "/"
@@ -21,8 +30,22 @@ updates:
       interval: daily
 #    registries:
 #      - mvn-repo
+    groups:
+      gradle-bump:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: docker
     directory: "/"
     schedule:
       interval: daily
+    groups:
+      docker-bump:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
