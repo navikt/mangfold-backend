@@ -75,6 +75,33 @@ Response:
 ]
 ```
 
+### Avdeling med seksjoner
+```http
+GET /avdelinger-med-seksjoner
+Response:
+[
+  {
+    "avdeling": "IT-avdelingen",
+    "seksjoner": [
+      {
+        "gruppe": "Utviklingsseksjonen",
+        "kjonnAntall": {
+          "kvinne": 40,
+          "mann": 80
+        }
+      },
+      {
+        "gruppe": "Driftsseksjonen",
+        "kjonnAntall": {
+          "kvinne": 60,
+          "mann": 120
+        }
+      }
+    ]
+  }
+]
+```
+
 ### Alle tilgjengelige endepunkter
 - `/kjonn-statistikk` - Total kjønnsfordeling
 - `/kjonn-per-avdeling` - Kjønnsfordeling per avdeling
@@ -90,6 +117,7 @@ Response:
 - `/kjonn-per-aldersgruppe` - Kjønnsfordeling per aldersgruppe
 - `/kjonn-per-ansiennitetsgruppe` - Kjønnsfordeling per ansiennitetsgruppe
 - `/nyansatte-per-aar` - Statistikk over nyansettelser per år
+- `/avdelinger-med-seksjoner` - Kjønnsfordeling per seksjon gruppert under avdelinger
 
 ## Deployment
 
