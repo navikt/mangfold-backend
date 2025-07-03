@@ -7,6 +7,7 @@ fun hentTotalKjonnStatistikk(prosjektId: String): List<KjonnAntall> {
     val query = """
         SELECT kjonn, SUM(antall) AS antall
         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
+        WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
         GROUP BY kjonn
     """.trimIndent()
     return runBigQuery(query, prosjektId).map { rad ->

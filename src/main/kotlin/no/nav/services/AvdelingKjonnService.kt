@@ -6,12 +6,12 @@ import no.nav.Konfig
 
 fun hentKjonnPerAvdeling(prosjektId: String): List<KjonnGruppeAntall> {
     val query = """
-        SELECT organisasjon_avdeling, kjonn, COUNT(*) AS antall
-        FROM `${Konfig.ANSATTE_TABELL}`
-        GROUP BY organisasjon_avdeling, kjonn
+        SELECT orgniv2_navn AS avdeling, kjonn, SUM(antall) AS antall
+        FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`        
+        GROUP BY avdeling, kjonn
     """.trimIndent()
     val rows = runBigQuery(query, prosjektId)
-    return rows.groupBy { it["organisasjon_avdeling"].stringValue }
+    return rows.groupBy { it["avdeling"].stringValue }
         .map { (avdeling, groupRows) ->
             val kjonnMap = groupRows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
             KjonnGruppeAntall(
