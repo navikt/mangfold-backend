@@ -102,6 +102,42 @@ Response:
 ]
 ```
 
+### Ledernivå per avdeling
+```http
+GET /lederniva-kjonn-per-avdeling
+Response:
+[
+  {
+    "gruppe1": "Teknologi",
+    "gruppe2": "6",
+    "kjonnAntall": {
+      "kvinne": 15,
+      "mann": 22
+    }
+  },
+  {
+    "gruppe1": "HR",
+    "gruppe2": "5",
+    "kjonnAntall": {
+      "kvinne": 1
+    }
+  },
+  {
+    "gruppe1": "Økonomi",
+    "gruppe2": "6",
+    "kjonnAntall": {
+      "kvinne": 4,
+      "mann": 3
+    }
+  }
+]
+```
+
+Hvor:
+- `gruppe1`: Avdelingsnavn
+- `gruppe2`: Ledernivå (3-6, hvor 6 er ikke-leder)
+- `kjonnAntall`: Antall kvinner og menn på dette nivået i avdelingen
+
 ### Alle tilgjengelige endepunkter
 - `/kjonn-statistikk` - Total kjønnsfordeling
 - `/kjonn-per-avdeling` - Kjønnsfordeling per avdeling
@@ -118,6 +154,8 @@ Response:
 - `/kjonn-per-ansiennitetsgruppe` - Kjønnsfordeling per ansiennitetsgruppe
 - `/nyansatte-per-aar` - Statistikk over nyansettelser per år
 - `/avdelinger-med-seksjoner` - Kjønnsfordeling per seksjon gruppert under avdelinger
+- `/lederniva-kjonn-per-avdeling` - Kjønnsfordeling per ledernivå gruppert på avdeling
+
 
 ## Deployment
 

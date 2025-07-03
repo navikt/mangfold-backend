@@ -8,6 +8,7 @@ import org.slf4j.Logger
 import no.nav.services.hentKjonnPerAvdeling
 import no.nav.services.hentAldersgruppeKjonnPerAvdeling
 import no.nav.services.hentAnsiennnitetsgruppeKjonnPerAvdeling
+import no.nav.services.hentLedernivaKjonnPerAvdeling
 
 fun Route.kjonnAvdelingRoutes(projectId: String, logger: Logger) {
     get("/kjonn-per-avdeling") {
@@ -40,4 +41,15 @@ fun Route.kjonnAvdelingRoutes(projectId: String, logger: Logger) {
             call.respond(HttpStatusCode.InternalServerError, "Feil i ansiennitet-kjonn-per-avdeling: ${e.message}")
         }
     }
+    get("/lederniva-kjonn-per-avdeling") {
+        logger.info("Kaller hentLedernivaKjonnPerAvdeling")
+        try {
+            val result = hentLedernivaKjonnPerAvdeling(projectId)
+            call.respond(result)
+        } catch (e: Exception) {
+            logger.error("Feil i lederniva-kjonn-per-avdeling", e)
+            call.respond(HttpStatusCode.InternalServerError, "Feil i lederniva-kjonn-per-avdeling: ${e.message}")
+        }
+    }
+    
 }

@@ -64,3 +64,27 @@ fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperK
             )
         }
 }
+
+fun hentLedernivaKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
+    val query = """
+        SELECT organisasjon_avdeling, lederniva, kjonn, COUNT(*) AS antall
+        FROM `${Konfig.ANSATTE_TABELL}`
+        GROUP BY organisasjon_avdeling, lederniva, kjonn
+    """.trimIndent()
+    val rows = runBigQuery(query, prosjektId)
+    return rows.groupBy { 
+            val avd = it["organisasjon_avdeling"]?.stringValue ?: "Ukjent"
+            val lederniva = it["lederniva"]?.stringValue ?: "Ukjent"
+            avd to lederniva
+        }
+        .map { (pair, groupRows) ->
+            val kjonnMap = groupRows.associate { 
+                (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue 
+            }
+            ToGrupperKjonnAntall(
+                gruppe1 = pair.first,
+                gruppe2 = pair.second,
+                kjonnAntall = kjonnMap
+            )
+        }
+}
