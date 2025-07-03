@@ -12,6 +12,8 @@ spec:
     bigQueryDatasets:
       - name: hr_data
         permission: READ
+      - name: mangfold_processed_data
+        permission: READ
 
   ingresses:
     - https://mangfold-backend.intern.dev.nav.no

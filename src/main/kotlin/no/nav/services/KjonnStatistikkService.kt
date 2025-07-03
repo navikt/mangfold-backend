@@ -5,8 +5,8 @@ import no.nav.Konfig
 
 fun hentTotalKjonnStatistikk(prosjektId: String): List<KjonnAntall> {
     val query = """
-        SELECT kjonn, COUNT(*) AS antall
-        FROM `${Konfig.ANSATTE_TABELL}`
+        SELECT kjonn, SUM(antall) AS antall
+        FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
         GROUP BY kjonn
     """.trimIndent()
     return runBigQuery(query, prosjektId).map { rad ->
