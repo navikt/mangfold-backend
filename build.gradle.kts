@@ -2,7 +2,7 @@
 val ktorVersion = "3.2.0"
 val logbackVersion = "1.5.18"
 val logstashEncoderVersion = "8.1"
-val junitVersion = "5.13.1"
+val junitVersion = "5.13.2"
 val mainClassName = "no.nav.MainKt"
 
 plugins {
@@ -30,7 +30,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-    implementation(platform("com.google.cloud:libraries-bom:26.62.0"))
+    implementation(platform("com.google.cloud:libraries-bom:26.63.0"))
     implementation("com.google.cloud:google-cloud-bigquery")
 
 
