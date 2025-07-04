@@ -9,22 +9,23 @@ import no.nav.modeller.KjonnAntallData
 
 fun hentAvdelingerMedSeksjoner(prosjektId: String): List<AvdelingSeksjoner> {
     val query = """
-        SELECT 
-            organisasjon_avdeling,
-            organisasjon_seksjon,
+        SELECT
+            orgniv2_navn AS avdeling,
+            org_seksjon AS seksjon,
             kjonn,
-            COUNT(*) AS antall
-        FROM `${Konfig.ANSATTE_TABELL}`
-        GROUP BY organisasjon_avdeling, organisasjon_seksjon, kjonn
-        ORDER BY organisasjon_avdeling, organisasjon_seksjon
+            SUM(antall) AS antall
+        FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
+        WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
+        GROUP BY avdeling, seksjon, kjonn
+        ORDER BY avdeling, seksjon
     """.trimIndent()
     
     val rows = runBigQuery(query, prosjektId)
     
-    return rows.groupBy { it["organisasjon_avdeling"].stringValue }
+    return rows.groupBy { it["avdeling"].stringValue }
         .map { (avdeling, avdelingRows) ->
             val seksjoner = avdelingRows
-                .groupBy { it["organisasjon_seksjon"].stringValue }
+                .groupBy { it["seksjon"].stringValue }
                 .map { (seksjon, seksjonRows) ->
                     val kjonnMap = seksjonRows.associate { 
                         it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
@@ -45,29 +46,30 @@ fun hentAvdelingerMedSeksjoner(prosjektId: String): List<AvdelingSeksjoner> {
 fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAldersgrupperSeksjoner> {
     val query = """
         SELECT 
-            organisasjon_avdeling,
-            organisasjon_seksjon,
+            orgniv2_navn AS avdeling,
+            org_seksjon AS seksjon,
             aldersgruppe,
             kjonn,
-            COUNT(*) AS antall
-        FROM `${Konfig.ANSATTE_TABELL}`
+            SUM(antall) AS antall
+        FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
+        WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
         GROUP BY 
-            organisasjon_avdeling,
-            organisasjon_seksjon,
+            avdeling,
+            seksjon,
             aldersgruppe,
             kjonn
         ORDER BY 
-            organisasjon_avdeling,
-            organisasjon_seksjon,
+            avdeling,
+            seksjon,
             aldersgruppe
     """.trimIndent()
     
     val rows = runBigQuery(query, prosjektId)
     
-    return rows.groupBy { it["organisasjon_avdeling"].stringValue }
+    return rows.groupBy { it["avdeling"].stringValue }
         .map { (avdeling, avdelingRows) ->
             val seksjoner = avdelingRows
-                .groupBy { it["organisasjon_seksjon"].stringValue }
+                .groupBy { it["seksjon"].stringValue }
                 .map { (seksjon, seksjonRows) ->
                     val aldersgruppeMap = seksjonRows
                         .groupBy { it["aldersgruppe"].stringValue }
