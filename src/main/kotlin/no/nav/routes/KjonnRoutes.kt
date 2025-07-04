@@ -16,6 +16,7 @@ fun Application.KjonnRoutes(projectId: String) {
         kjonnAldersgruppeRoutes(projectId, logger)
         kjonnAnsiennitetsgruppeRoutes(projectId, logger)
         aldersgruppePerRolle(projectId, logger)
-        avdelingSeksjonRoutes(projectId, logger)  // Legg til denne linjen
+        avdelingSeksjonRoutes(projectId, logger)
+        kjonnStillingsnavnRoutes(projectId, logger)
     }
 }
