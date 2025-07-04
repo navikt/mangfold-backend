@@ -138,6 +138,37 @@ Hvor:
 - `gruppe2`: Ledernivå (3-6, hvor 6 er ikke-leder)
 - `kjonnAntall`: Antall kvinner og menn på dette nivået i avdelingen
 
+### Stillingsnavn statistikk
+```http
+GET /kjonn-per-stilling
+Response:
+[
+  {
+    "gruppe": "Seniorrådgiver",
+    "kjonnAntall": {
+      "kvinne": 150,
+      "mann": 200
+    }
+  }
+]
+```
+
+### Aldersgrupper per stillingsnavn
+```http
+GET /aldersgruppe-per-stilling
+Response:
+[
+  {
+    "gruppe1": "Seniorrådgiver",
+    "gruppe2": "30-39",
+    "kjonnAntall": {
+      "kvinne": 25,
+      "mann": 35
+    }
+  }
+]
+```
+
 ### Alle tilgjengelige endepunkter
 - `/kjonn-statistikk` - Total kjønnsfordeling
 - `/kjonn-per-avdeling` - Kjønnsfordeling per avdeling
@@ -155,6 +186,8 @@ Hvor:
 - `/nyansatte-per-aar` - Statistikk over nyansettelser per år
 - `/avdelinger-med-seksjoner` - Kjønnsfordeling per seksjon gruppert under avdelinger
 - `/lederniva-kjonn-per-avdeling` - Kjønnsfordeling per ledernivå gruppert på avdeling
+- `/kjonn-per-stilling` - Kjønnsfordeling per stillingsnavn
+- `/aldersgruppe-per-stilling` - Kjønnsfordeling per aldersgruppe og stillingsnavn
 
 
 ## Deployment
