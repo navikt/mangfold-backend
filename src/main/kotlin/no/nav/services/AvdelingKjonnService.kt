@@ -68,11 +68,14 @@ fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperK
         ORDER BY 
             avdeling,
             CASE 
-                WHEN ansiennitetsgruppe = '<2' THEN 1
-                WHEN ansiennitetsgruppe = '2-5' THEN 2
-                WHEN ansiennitetsgruppe = '5-10' THEN 3
-                WHEN ansiennitetsgruppe = '10+' THEN 4
-                ELSE 0
+                WHEN ansiennitetsgruppe = '0-2' THEN 1
+                WHEN ansiennitetsgruppe = '2-4' THEN 2
+                WHEN ansiennitetsgruppe = '4-6' THEN 3
+                WHEN ansiennitetsgruppe = '6-8' THEN 4
+                WHEN ansiennitetsgruppe = '8-10' THEN 5
+                WHEN ansiennitetsgruppe = '10-16' THEN 6
+                WHEN ansiennitetsgruppe = '16+' THEN 7
+                ELSE 8
             END
     """.trimIndent()
     
