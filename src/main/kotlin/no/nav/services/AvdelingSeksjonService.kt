@@ -18,7 +18,7 @@ fun hentAvdelingerMedSeksjoner(prosjektId: String): List<AvdelingSeksjoner> {
         WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
             AND orgniv2_navn != org_seksjon
         GROUP BY avdeling, seksjon, kjonn
-        ORDER BY avdeling, seksjon
+        ORDER BY avdeling ASC, seksjon ASC
     """.trimIndent()
     
     val rows = runBigQuery(query, prosjektId)
@@ -61,8 +61,8 @@ fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAlde
             aldersgruppe,
             kjonn
         ORDER BY 
-            avdeling,
-            seksjon,
+            avdeling ASC,
+            seksjon ASC,
             aldersgruppe
     """.trimIndent()
     
