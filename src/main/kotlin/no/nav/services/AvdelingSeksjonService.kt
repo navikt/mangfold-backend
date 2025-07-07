@@ -16,6 +16,7 @@ fun hentAvdelingerMedSeksjoner(prosjektId: String): List<AvdelingSeksjoner> {
             SUM(antall) AS antall
         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
         WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
+            AND orgniv2_navn != org_seksjon
         GROUP BY avdeling, seksjon, kjonn
         ORDER BY avdeling, seksjon
     """.trimIndent()
@@ -53,6 +54,7 @@ fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAlde
             SUM(antall) AS antall
         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
         WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
+            AND orgniv2_navn != org_seksjon
         GROUP BY 
             avdeling,
             seksjon,

@@ -9,6 +9,7 @@ fun hentKjonnPerAvdeling(prosjektId: String): List<KjonnGruppeAntall> {
         SELECT orgniv2_navn AS avdeling, kjonn, SUM(antall) AS antall
         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`        
         GROUP BY avdeling, kjonn
+        ORDER BY kjonn asc, antall DESC
     """.trimIndent()
     val rows = runBigQuery(query, prosjektId)
     return rows.groupBy { it["avdeling"].stringValue }
