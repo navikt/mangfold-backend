@@ -51,7 +51,12 @@ fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAlde
             org_seksjon AS seksjon,
             aldersgruppe,
             kjonn,
-            SUM(antall) AS antall
+            SUM(antall) AS antall,
+            CASE WHEN aldersgruppe = '<30' THEN 1
+                 WHEN aldersgruppe = '30-50' THEN 2
+                 WHEN aldersgruppe = '50+' THEN 3
+                 ELSE 0
+            END AS aldersgruppe_sort
         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
         WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
             AND orgniv2_navn != org_seksjon
@@ -63,7 +68,7 @@ fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAlde
         ORDER BY 
             avdeling ASC,
             seksjon ASC,
-            aldersgruppe
+            aldersgruppe_sort
     """.trimIndent()
     
     val rows = runBigQuery(query, prosjektId)
