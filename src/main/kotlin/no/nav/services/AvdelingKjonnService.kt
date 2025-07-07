@@ -6,10 +6,18 @@ import no.nav.Konfig
 
 fun hentKjonnPerAvdeling(prosjektId: String): List<KjonnGruppeAntall> {
     val query = """
-        SELECT orgniv2_navn AS avdeling, kjonn, SUM(antall) AS antall
+    WITH antall_avdeling AS (
+        SELECT orgniv2_navn AS avdeling, SUM(antall) AS antall_avd
         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`        
-        GROUP BY avdeling, kjonn
-        ORDER BY kjonn asc, antall DESC
+        GROUP BY avdeling
+    )
+
+    SELECT orgniv2_navn AS avdeling, kjonn, SUM(antall) AS antall, sum(antall)/antall_avd andel_kjonn_seksjon, antall_avd
+    FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`        
+    LEFT JOIN antall_avdeling on avdeling = orgniv2_navn
+    GROUP BY avdeling, kjonn, antall_avd
+    ORDER BY kjonn asc, andel_kjonn_seksjon desc
+
     """.trimIndent()
     val rows = runBigQuery(query, prosjektId)
     return rows.groupBy { it["avdeling"].stringValue }
