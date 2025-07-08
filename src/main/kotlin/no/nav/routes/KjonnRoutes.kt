@@ -12,7 +12,6 @@ fun Application.KjonnRoutes(projectId: String) {
         kjonnAvdelingRoutes(projectId, logger)
         kjonnSeksjonRoutes(projectId, logger)
         kjonnRolleRoutes(projectId, logger)
-        kjonnLedernivaRoutes(projectId, logger)
         kjonnAldersgruppeRoutes(projectId, logger)
         kjonnAnsiennitetsgruppeRoutes(projectId, logger)
         aldersgruppePerRolle(projectId, logger)

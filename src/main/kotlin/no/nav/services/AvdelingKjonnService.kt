@@ -98,24 +98,35 @@ fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperK
 
 fun hentLedernivaKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
     val query = """
-        SELECT organisasjon_avdeling, lederniva, kjonn, COUNT(*) AS antall
-        FROM `${Konfig.ANSATTE_TABELL}`
-        GROUP BY organisasjon_avdeling, lederniva, kjonn
+        SELECT 
+            orgniv2_navn AS avdeling,
+            lederniva,
+            kjonn,
+            SUM(antall) AS antall
+        FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
+        WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
+        GROUP BY 
+            avdeling,
+            lederniva,
+            kjonn
+        ORDER BY 
+            avdeling,
+            lederniva DESC
     """.trimIndent()
+    
     val rows = runBigQuery(query, prosjektId)
     return rows.groupBy { 
-            val avd = it["organisasjon_avdeling"]?.stringValue ?: "Ukjent"
-            val lederniva = it["lederniva"]?.stringValue ?: "Ukjent"
-            avd to lederniva
+        val avd = it["avdeling"].stringValue
+        val lederniva = it["lederniva"].stringValue
+        avd to lederniva
+    }.map { (pair, groupRows) ->
+        val kjonnMap = groupRows.associate { 
+            it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
         }
-        .map { (pair, groupRows) ->
-            val kjonnMap = groupRows.associate { 
-                (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue 
-            }
-            ToGrupperKjonnAntall(
-                gruppe1 = pair.first,
-                gruppe2 = pair.second,
-                kjonnAntall = kjonnMap
-            )
-        }
+        ToGrupperKjonnAntall(
+            gruppe1 = pair.first,
+            gruppe2 = pair.second,
+            kjonnAntall = kjonnMap
+        )
+    }
 }
