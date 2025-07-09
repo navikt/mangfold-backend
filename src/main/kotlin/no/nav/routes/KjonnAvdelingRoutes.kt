@@ -9,6 +9,7 @@ import no.nav.services.hentKjonnPerAvdeling
 import no.nav.services.hentAldersgruppeKjonnPerAvdeling
 import no.nav.services.hentAnsiennnitetsgruppeKjonnPerAvdeling
 import no.nav.services.hentLedernivaKjonnPerAvdeling
+import no.nav.services.hentAnsattDetaljer
 
 fun Route.kjonnAvdelingRoutes(projectId: String, logger: Logger) {
     get("/kjonn-per-avdeling") {
@@ -51,5 +52,17 @@ fun Route.kjonnAvdelingRoutes(projectId: String, logger: Logger) {
             call.respond(HttpStatusCode.InternalServerError, "Feil i lederniva-kjonn-per-avdeling: ${e.message}")
         }
     }
-    
+    get("/ansatt-detaljer") {
+        logger.info("Kaller hentAnsattDetaljer")
+        try {
+            val result = hentAnsattDetaljer(projectId)
+            call.respond(result)
+        } catch (e: Exception) {
+            logger.error("Feil i ansatt-detaljer", e)
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                "Feil i ansatt-detaljer: ${e.message}"
+            )
+        }
+    }
 }
