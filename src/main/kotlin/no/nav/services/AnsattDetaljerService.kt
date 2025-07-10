@@ -26,7 +26,7 @@ fun hentAnsattDetaljer(prosjektId: String): List<AnsattDetaljer> {
                 WHEN ansiennitetsgruppe = '16+' THEN 7
                 ELSE 8
             END ASC,
-            CAST(lederniva AS INT64) ASC
+            lederniva ASC
     """.trimIndent()
     
     val rows = runBigQuery(query, prosjektId)
