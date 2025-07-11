@@ -41,7 +41,13 @@ fun hentAldersgruppePerStillingsnavn(prosjektId: String): List<ToGrupperKjonnAnt
             stillingsnavn,
             aldersgruppe,
             kjonn,
-            SUM(antall) AS antall
+            SUM(antall) AS antall,
+        CASE
+            WHEN aldersgruppe LIKE '<%' THEN 0
+            WHEN REGEXP_EXTRACT(aldersgruppe, r'^(\d+)') IS NOT NULL
+                THEN CAST(REGEXP_EXTRACT(aldersgruppe, r'^(\d+)') AS INT64)
+            ELSE 999
+        END AS aldersgruppe_sort
         FROM `${Konfig.ANSATT_GRUPPERT_HR_STILLING_ANTALL}`
         GROUP BY 
             stillingsnavn, 
@@ -49,12 +55,7 @@ fun hentAldersgruppePerStillingsnavn(prosjektId: String): List<ToGrupperKjonnAnt
             kjonn
         ORDER BY 
             stillingsnavn,
-            CASE 
-                WHEN aldersgruppe = '<30' THEN 1
-                WHEN aldersgruppe = '30-50' THEN 2
-                WHEN aldersgruppe = '50+' THEN 3
-                ELSE 0
-            END
+            aldersgruppe_sort
     """.trimIndent()
     
     val rows = runBigQuery(query, prosjektId)

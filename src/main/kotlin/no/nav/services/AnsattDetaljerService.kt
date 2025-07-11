@@ -10,22 +10,6 @@ fun hentAnsattDetaljer(prosjektId: String): List<AnsattDetaljer> {
         ORDER BY 
             orgniv2_navn ASC,
             org_seksjon ASC,
-            CASE 
-                WHEN aldersgruppe = '<30' THEN 1
-                WHEN aldersgruppe = '30-50' THEN 2
-                WHEN aldersgruppe = '50+' THEN 3
-                ELSE 4
-            END ASC,
-            CASE 
-                WHEN ansiennitetsgruppe = '0-2' THEN 1
-                WHEN ansiennitetsgruppe = '2-4' THEN 2
-                WHEN ansiennitetsgruppe = '4-6' THEN 3
-                WHEN ansiennitetsgruppe = '6-8' THEN 4
-                WHEN ansiennitetsgruppe = '8-10' THEN 5
-                WHEN ansiennitetsgruppe = '10-16' THEN 6
-                WHEN ansiennitetsgruppe = '16+' THEN 7
-                ELSE 8
-            END ASC,
             lederniva ASC
     """.trimIndent()
     
@@ -42,4 +26,26 @@ fun hentAnsattDetaljer(prosjektId: String): List<AnsattDetaljer> {
             antall = row["antall"].longValue
         )
     }
+     .sortedWith(
+            compareBy<AnsattDetaljer> { it.avdeling }
+                .thenBy { it.seksjon }
+                .thenBy { sorterAldersgruppe(it.aldersgruppe) }
+                .thenBy { sorterAnsiennitetsgruppe(it.ansiennitetsgruppe) }
+                .thenBy { it.lederniva }
+        )
+}
+
+// Sorteringslogikk for aldersgrupper
+private fun sorterAldersgruppe(aldersgruppe: String): Int {
+    return when {
+        aldersgruppe.startsWith("<") -> 0
+        Regex("""^\d+""").find(aldersgruppe) != null ->
+            Regex("""^\d+""").find(aldersgruppe)!!.value.toInt()
+        else -> 999
+    }
+}
+
+// Sorteringslogikk for ansiennitetsgrupper
+private fun sorterAnsiennitetsgruppe(ansiennitetsgruppe: String): Int {
+    return Regex("""^\d+""").find(ansiennitetsgruppe)?.value?.toInt() ?: 999
 }

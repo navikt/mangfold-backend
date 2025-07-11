@@ -59,14 +59,16 @@ fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAlde
             aldersgruppe,
             kjonn,
             SUM(antall) AS antall,
-            CASE WHEN aldersgruppe = '<30' THEN 1
-                 WHEN aldersgruppe = '30-50' THEN 2
-                 WHEN aldersgruppe = '50+' THEN 3
-                 ELSE 0
+            CASE
+                WHEN aldersgruppe LIKE '<%' THEN 0
+                WHEN REGEXP_EXTRACT(aldersgruppe, r'^(\d+)') IS NOT NULL
+                    THEN CAST(REGEXP_EXTRACT(aldersgruppe, r'^(\d+)') AS INT64)
+                ELSE 999
             END AS aldersgruppe_sort
         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
         WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
             AND orgniv2_navn != org_seksjon
+        AND aldersgruppe IS NOT NULL
         GROUP BY 
             avdeling,
             seksjon,
@@ -80,7 +82,18 @@ fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAlde
     
     val rows = runBigQuery(query, prosjektId)
     
-    val alleAldersgrupper = listOf("<30", "30-50", "50+")
+    val alleAldersgrupper = rows
+        .map { it["aldersgruppe"].stringValue }
+        .distinct()
+        .sortedWith(compareBy {
+            val str = it
+            when {
+                str.startsWith("<") -> 0
+                Regex("""^\d+""").find(str) != null ->
+                    Regex("""^\d+""").find(str)!!.value.toInt()
+                else -> 999
+            }
+        })
     
     return rows.groupBy { it["avdeling"].stringValue }
         .map { (avdeling, avdelingRows) ->
