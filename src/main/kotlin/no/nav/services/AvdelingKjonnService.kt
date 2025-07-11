@@ -25,32 +25,33 @@ fun hentKjonnPerAvdeling(prosjektId: String): List<KjonnGruppeAntall> {
             val kjonnMap = groupRows.associate { it["kjonn"].stringValue.lowercase() to it["antall"].longValue }
             KjonnGruppeAntall(
                 gruppe = avdeling,
-                kjonnAntall = kjonnMap
+                kjonnAntall = kjonnMap,
+                erMaskert = false //Antar at det ikke er maskert her, da det er aggregert på avdeling
             )
         }
 }
 
-fun hentAldersgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
-    val query = """
-        SELECT organisasjon_avdeling, aldersgruppe, kjonn, COUNT(*) AS antall
-        FROM `${Konfig.ANSATTE_TABELL}`
-        GROUP BY organisasjon_avdeling, aldersgruppe, kjonn
-    """.trimIndent()
-    val rows = runBigQuery(query, prosjektId)
-    return rows.groupBy { 
-            val avd = it["organisasjon_avdeling"]?.stringValue ?: "Ukjent"
-            val alder = it["aldersgruppe"]?.stringValue ?: "Ukjent"
-            avd to alder
-        }
-        .map { (pair, groupRows) ->
-            val kjonnMap = groupRows.associate { (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue }
-        ToGrupperKjonnAntall(
-            gruppe1 = pair.first,
-            gruppe2 = pair.second,
-            kjonnAntall = kjonnMap
-        )
-        }
-}
+// fun hentAldersgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
+//     val query = """
+//         SELECT organisasjon_avdeling, aldersgruppe, kjonn, COUNT(*) AS antall
+//         FROM `${Konfig.ANSATTE_TABELL}`
+//         GROUP BY organisasjon_avdeling, aldersgruppe, kjonn
+//     """.trimIndent()
+//     val rows = runBigQuery(query, prosjektId)
+//     return rows.groupBy { 
+//             val avd = it["organisasjon_avdeling"]?.stringValue ?: "Ukjent"
+//             val alder = it["aldersgruppe"]?.stringValue ?: "Ukjent"
+//             avd to alder
+//         }
+//         .map { (pair, groupRows) ->
+//             val kjonnMap = groupRows.associate { (it["kjonn"]?.stringValue ?: "annet").lowercase() to it["antall"].longValue }
+//         ToGrupperKjonnAntall(
+//             gruppe1 = pair.first,
+//             gruppe2 = pair.second,
+//             kjonnAntall = kjonnMap
+//         )
+//         }
+// }
 
 fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
     val query = """
