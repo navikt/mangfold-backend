@@ -11,5 +11,6 @@ data class AvdelingSeksjoner(
 @Serializable
 data class SeksjonKjonnData(
     val gruppe: String,
-    val kjonnAntall: Map<String, Long>
+    val kjonnAntall: Map<String, Long>,
+    val erMaskert: Boolean
 )

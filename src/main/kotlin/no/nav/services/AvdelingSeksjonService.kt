@@ -28,12 +28,19 @@ fun hentAvdelingerMedSeksjoner(prosjektId: String): List<AvdelingSeksjoner> {
             val seksjoner = avdelingRows
                 .groupBy { it["seksjon"].stringValue }
                 .map { (seksjon, seksjonRows) ->
-                    val kjonnMap = seksjonRows.associate { 
+
+                    val total = seksjonRows.sumOf { it["antall"].longValue }
+                    val (kjonnMap, erMaskert) = if (total < 5) {
+                        mapOf("kvinne" to 0L, "mann" to 0L) to true
+                    } else {
+                     seksjonRows.associate { 
                         it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
+                        } to false
                     }
                     SeksjonKjonnData(
                         gruppe = seksjon,
-                        kjonnAntall = kjonnMap
+                        kjonnAntall = kjonnMap,
+                        erMaskert = erMaskert
                     )
                 }
             
@@ -73,26 +80,42 @@ fun hentAldersgrupperPerAvdelingSeksjoner(prosjektId: String): List<AvdelingAlde
     
     val rows = runBigQuery(query, prosjektId)
     
+    val alleAldersgrupper = listOf("<30", "30-50", "50+")
+    
     return rows.groupBy { it["avdeling"].stringValue }
         .map { (avdeling, avdelingRows) ->
             val seksjoner = avdelingRows
                 .groupBy { it["seksjon"].stringValue }
                 .map { (seksjon, seksjonRows) ->
-                    val aldersgruppeMap = seksjonRows
-                        .groupBy { it["aldersgruppe"].stringValue }
-                        .mapValues { (_, aldersgruppe) ->
-                            val kjonnMap = aldersgruppe.associate { 
-                                it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
-                            }
-                            KjonnAntallData(
-                                kvinne = kjonnMap["kvinne"] ?: 0,
-                                mann = kjonnMap["mann"] ?: 0
-                            )
+                    val total = seksjonRows.sumOf { it["antall"].longValue }
+                    val erMaskert = total < 5
+
+                    val aldersgruppeMap = if (erMaskert) {
+                        alleAldersgrupper.associateWith { 
+                            KjonnAntallData(kvinne = 0, mann = 0)
                         }
+                    } else {
+                        val gruppertData = seksjonRows
+                            .groupBy { it["aldersgruppe"].stringValue }
+                            .mapValues { (_, aldersgruppe) ->
+                                val kjonnMap = aldersgruppe.associate { 
+                                    it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
+                                }
+                                KjonnAntallData(
+                                    kvinne = kjonnMap["kvinne"] ?: 0,
+                                    mann = kjonnMap["mann"] ?: 0
+                                )
+                            }
+                        
+                        alleAldersgrupper.associateWith { aldersgruppe ->
+                            gruppertData[aldersgruppe] ?: KjonnAntallData(kvinne = 0, mann = 0)
+                        }
+                    }
                     
                     SeksjonAldersgrupper(
                         seksjon = seksjon,
-                        aldersgrupper = aldersgruppeMap
+                        aldersgrupper = aldersgruppeMap,
+                        erMaskert = erMaskert
                     )
                 }
             
