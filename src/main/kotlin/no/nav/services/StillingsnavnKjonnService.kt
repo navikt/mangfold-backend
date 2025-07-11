@@ -64,13 +64,20 @@ fun hentAldersgruppePerStillingsnavn(prosjektId: String): List<ToGrupperKjonnAnt
         val alder = it["aldersgruppe"].stringValue
         stilling to alder 
     }.map { (pair, groupRows) ->
-        val kjonnMap = groupRows.associate { 
-            it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
+
+        val total = groupRows.sumOf { it["antall"].longValue }
+        val (kjonnMap, erMaskert) = if (total < 5) {
+            mapOf("kvinne" to 0L, "mann" to 0L) to true
+        } else {
+            groupRows.associate { 
+                it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
+            } to false
         }
         ToGrupperKjonnAntall(
             gruppe1 = pair.first,
             gruppe2 = pair.second,
-            kjonnAntall = kjonnMap
+            kjonnAntall = kjonnMap,
+            erMaskert = erMaskert
         )
     }
 }

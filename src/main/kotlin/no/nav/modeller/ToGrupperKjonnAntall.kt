@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class ToGrupperKjonnAntall(
     val gruppe1: String,
     val gruppe2: String,
-    val kjonnAntall: Map<String, Long>
+    val kjonnAntall: Map<String, Long>,
+    val erMaskert: Boolean
 )

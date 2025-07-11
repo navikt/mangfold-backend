@@ -53,81 +53,81 @@ fun hentKjonnPerAvdeling(prosjektId: String): List<KjonnGruppeAntall> {
 //         }
 // }
 
-fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
-    val query = """
-        SELECT 
-            orgniv2_navn AS avdeling,
-            ansiennitetsgruppe,
-            kjonn,
-            SUM(antall) AS antall
-        FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
-        WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
-        GROUP BY 
-            avdeling,
-            ansiennitetsgruppe,
-            kjonn
-        ORDER BY 
-            avdeling,
-            CASE 
-                WHEN ansiennitetsgruppe = '0-2' THEN 1
-                WHEN ansiennitetsgruppe = '2-4' THEN 2
-                WHEN ansiennitetsgruppe = '4-6' THEN 3
-                WHEN ansiennitetsgruppe = '6-8' THEN 4
-                WHEN ansiennitetsgruppe = '8-10' THEN 5
-                WHEN ansiennitetsgruppe = '10-16' THEN 6
-                WHEN ansiennitetsgruppe = '16+' THEN 7
-                ELSE 8
-            END
-    """.trimIndent()
+// fun hentAnsiennnitetsgruppeKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
+//     val query = """
+//         SELECT 
+//             orgniv2_navn AS avdeling,
+//             ansiennitetsgruppe,
+//             kjonn,
+//             SUM(antall) AS antall
+//         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
+//         WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
+//         GROUP BY 
+//             avdeling,
+//             ansiennitetsgruppe,
+//             kjonn
+//         ORDER BY 
+//             avdeling,
+//             CASE 
+//                 WHEN ansiennitetsgruppe = '0-2' THEN 1
+//                 WHEN ansiennitetsgruppe = '2-4' THEN 2
+//                 WHEN ansiennitetsgruppe = '4-6' THEN 3
+//                 WHEN ansiennitetsgruppe = '6-8' THEN 4
+//                 WHEN ansiennitetsgruppe = '8-10' THEN 5
+//                 WHEN ansiennitetsgruppe = '10-16' THEN 6
+//                 WHEN ansiennitetsgruppe = '16+' THEN 7
+//                 ELSE 8
+//             END
+//     """.trimIndent()
     
-    val rows = runBigQuery(query, prosjektId)
-    return rows.groupBy { 
-        val avd = it["avdeling"].stringValue
-        val ans = it["ansiennitetsgruppe"].stringValue
-        avd to ans
-    }.map { (pair, groupRows) ->
-        val kjonnMap = groupRows.associate { 
-            it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
-        }
-        ToGrupperKjonnAntall(
-            gruppe1 = pair.first,
-            gruppe2 = pair.second,
-            kjonnAntall = kjonnMap
-        )
-    }
-}
+//     val rows = runBigQuery(query, prosjektId)
+//     return rows.groupBy { 
+//         val avd = it["avdeling"].stringValue
+//         val ans = it["ansiennitetsgruppe"].stringValue
+//         avd to ans
+//     }.map { (pair, groupRows) ->
+//         val kjonnMap = groupRows.associate { 
+//             it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
+//         }
+//         ToGrupperKjonnAntall(
+//             gruppe1 = pair.first,
+//             gruppe2 = pair.second,
+//             kjonnAntall = kjonnMap
+//         )
+//     }
+// }
 
-fun hentLedernivaKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
-    val query = """
-        SELECT 
-            orgniv2_navn AS avdeling,
-            lederniva,
-            kjonn,
-            SUM(antall) AS antall
-        FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
-        WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
-        GROUP BY 
-            avdeling,
-            lederniva,
-            kjonn
-        ORDER BY 
-            avdeling,
-            lederniva DESC
-    """.trimIndent()
+// fun hentLedernivaKjonnPerAvdeling(prosjektId: String): List<ToGrupperKjonnAntall> {
+//     val query = """
+//         SELECT 
+//             orgniv2_navn AS avdeling,
+//             lederniva,
+//             kjonn,
+//             SUM(antall) AS antall
+//         FROM `${Konfig.ANSATT_GRUPPERT_HR_AVDELING_ANTALL}`
+//         WHERE orgniv1_navn = 'Arbeids- og velferdsdirektoratet'
+//         GROUP BY 
+//             avdeling,
+//             lederniva,
+//             kjonn
+//         ORDER BY 
+//             avdeling,
+//             lederniva DESC
+//     """.trimIndent()
     
-    val rows = runBigQuery(query, prosjektId)
-    return rows.groupBy { 
-        val avd = it["avdeling"].stringValue
-        val lederniva = it["lederniva"].stringValue
-        avd to lederniva
-    }.map { (pair, groupRows) ->
-        val kjonnMap = groupRows.associate { 
-            it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
-        }
-        ToGrupperKjonnAntall(
-            gruppe1 = pair.first,
-            gruppe2 = pair.second,
-            kjonnAntall = kjonnMap
-        )
-    }
-}
+//     val rows = runBigQuery(query, prosjektId)
+//     return rows.groupBy { 
+//         val avd = it["avdeling"].stringValue
+//         val lederniva = it["lederniva"].stringValue
+//         avd to lederniva
+//     }.map { (pair, groupRows) ->
+//         val kjonnMap = groupRows.associate { 
+//             it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
+//         }
+//         ToGrupperKjonnAntall(
+//             gruppe1 = pair.first,
+//             gruppe2 = pair.second,
+//             kjonnAntall = kjonnMap
+//         )
+//     }
+// }
