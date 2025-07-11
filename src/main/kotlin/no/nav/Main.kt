@@ -18,7 +18,10 @@ fun Application.module() {
         ?: throw IllegalStateException("BIGQUERY_PROJECT_ID må settes")
     
     install(CORS) {
-        anyHost() // Mulig denne kan/må endres
+        // anyHost() // Mulig denne kan/må endres
+        allowHost("localhost:3000", schemes = listOf("http"))
+        allowHost("*.ansatt.no", schemes = listOf("https"))
+        allowHost("*.intern.nav.no", schemes = listOf("https"))
         allowHeader(HttpHeaders.ContentType)
         allowMethod(HttpMethod.Get)
     }
