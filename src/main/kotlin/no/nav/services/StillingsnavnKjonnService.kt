@@ -57,25 +57,34 @@ fun hentAldersgruppePerStillingsnavn(prosjektId: String): List<ToGrupperKjonnAnt
             stillingsnavn,
             aldersgruppe_sort
     """.trimIndent()
-    
+
     val rows = runBigQuery(query, prosjektId)
-    
+
+    // 1. Gruppér alle rader per stillingsnavn
+    val stillingTilRader = rows.groupBy { it["stillingsnavn"].stringValue }
+
+    // 2. Finn for hver stilling total antall personer på tvers av alle aldersgrupper og kjønn
+    val stillingMaskering: Map<String, Boolean> = stillingTilRader.mapValues { (_, rader) ->
+        rader.sumOf { it["antall"].longValue } < 5
+    }
+
+    // 3. Lag output: For hver (stilling, aldersgruppe), sett erMaskert = true hvis stillingen skal maskeres
     return rows.groupBy { 
         val stilling = it["stillingsnavn"].stringValue
         val alder = it["aldersgruppe"].stringValue
         stilling to alder 
     }.map { (pair, groupRows) ->
-
-        val total = groupRows.sumOf { it["antall"].longValue }
-        val (kjonnMap, erMaskert) = if (total < 5) {
-            mapOf("kvinne" to 0L, "mann" to 0L) to true
+        val stilling = pair.first
+        val erMaskert = stillingMaskering[stilling] ?: false
+        val kjonnMap = if (erMaskert) {
+            mapOf("kvinne" to 0L, "mann" to 0L)
         } else {
             groupRows.associate { 
                 it["kjonn"].stringValue.lowercase() to it["antall"].longValue 
-            } to false
+            }
         }
         ToGrupperKjonnAntall(
-            gruppe1 = pair.first,
+            gruppe1 = stilling,
             gruppe2 = pair.second,
             kjonnAntall = kjonnMap,
             erMaskert = erMaskert
