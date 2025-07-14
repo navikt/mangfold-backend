@@ -20,8 +20,11 @@ fun Application.module() {
     install(CORS) {
         // anyHost() // Mulig denne kan/må endres
         allowHost("localhost:3000", schemes = listOf("http"))
-        allowHost("*.ansatt.no", schemes = listOf("https"))
+        // nav sine sider, sjekk https://docs.nais.io/workloads/reference/environments/
+        allowHost("*.ansatt.nav.no", schemes = listOf("https"))
         allowHost("*.intern.nav.no", schemes = listOf("https"))
+        allowHost("*.ansatt.dev.nav.no", schemes = listOf("https"))
+        allowHost("*.intern.dev.nav.no", schemes = listOf("https"))
         allowHeader(HttpHeaders.ContentType)
         allowMethod(HttpMethod.Get)
     }
