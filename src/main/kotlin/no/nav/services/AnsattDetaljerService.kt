@@ -12,7 +12,7 @@ fun hentAnsattDetaljer(prosjektId: String): List<AnsattDetaljer> {
             org_seksjon ASC,
             lederniva ASC
     """.trimIndent()
-    
+
     val rows = runBigQuery(query, prosjektId)
     return rows.map { row ->
         AnsattDetaljer(
@@ -26,13 +26,17 @@ fun hentAnsattDetaljer(prosjektId: String): List<AnsattDetaljer> {
             antall = row["antall"].longValue
         )
     }
-     .sortedWith(
-            compareBy<AnsattDetaljer> { it.avdeling }
-                .thenBy { it.seksjon }
-                .thenBy { sorterAldersgruppe(it.aldersgruppe) }
-                .thenBy { sorterAnsiennitetsgruppe(it.ansiennitetsgruppe) }
-                .thenBy { it.lederniva }
-        )
+    // Filtrer ut alle der seksjonsnavn er lik avdelingsnavn
+    .filterNot { ansatt ->
+        ansatt.seksjon == ansatt.avdeling
+    }
+    .sortedWith(
+        compareBy<AnsattDetaljer> { it.avdeling }
+            .thenBy { it.seksjon }
+            .thenBy { sorterAldersgruppe(it.aldersgruppe) }
+            .thenBy { sorterAnsiennitetsgruppe(it.ansiennitetsgruppe) }
+            .thenBy { it.lederniva }
+    )
 }
 
 // Sorteringslogikk for aldersgrupper
