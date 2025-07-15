@@ -3,3 +3,6 @@
 build
 .kotlin
 .idea
+*.json
+secrets/
+credentials/
