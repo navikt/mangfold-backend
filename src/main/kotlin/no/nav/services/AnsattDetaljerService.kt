@@ -26,10 +26,10 @@ fun hentAnsattDetaljer(prosjektId: String): List<AnsattDetaljer> {
             antall = row["antall"].longValue
         )
     }
-    // Filtrer ut alle der seksjonsnavn er lik avdelingsnavn
-    .filterNot { ansatt ->
-        ansatt.seksjon == ansatt.avdeling
-    }
+    // // Filtrer ut alle der seksjonsnavn er lik avdelingsnavn
+    // .filterNot { ansatt ->
+    //     ansatt.seksjon == ansatt.avdeling
+    // }
     .sortedWith(
         compareBy<AnsattDetaljer> { it.avdeling }
             .thenBy { it.seksjon }
