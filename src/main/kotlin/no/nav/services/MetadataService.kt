@@ -14,7 +14,7 @@ fun hentMetadataOppdateringsDato(prosjektId: String): List<Metadata> {
     LIMIT 1
     """.trimIndent()
 
-    val formatter = DateTimeFormatter.ofPattern("dd. MMMM yyyy", java.util.Locale("nb", "NO"))
+    val formatter = DateTimeFormatter.ofPattern("dd. MMMM yyyy", java.util.Locale.forLanguageTag("nb-NO"))
 
     val rows = runBigQuery(query, prosjektId)
     return rows.map { row ->
