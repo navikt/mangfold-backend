@@ -18,13 +18,14 @@ fun Application.module() {
         ?: throw IllegalStateException("BIGQUERY_PROJECT_ID må settes")
     
     install(CORS) {
-        // anyHost() // Mulig denne kan/må endres
-        allowHost("localhost:3000", schemes = listOf("http"))
+
+        allowHost("localhost:3000", schemes = listOf("http")) //lokal utvikling, frontend
+
         // nav sine sider, sjekk https://docs.nais.io/workloads/reference/environments/
-        allowHost("*.ansatt.nav.no", schemes = listOf("https"))
-        allowHost("*.intern.nav.no", schemes = listOf("https"))
-        allowHost("*.ansatt.dev.nav.no", schemes = listOf("https"))
-        allowHost("*.intern.dev.nav.no", schemes = listOf("https"))
+        allowHost("mangfold.ansatt.nav.no", schemes = listOf("https"))
+        allowHost("mangfold.intern.nav.no", schemes = listOf("https"))
+        allowHost("mangfold.ansatt.dev.nav.no", schemes = listOf("https"))
+        allowHost("mangfold.intern.dev.nav.no", schemes = listOf("https"))
         allowHeader(HttpHeaders.ContentType)
         allowMethod(HttpMethod.Get)
     }
