@@ -10,11 +10,6 @@ fun Application.KjonnRoutes(projectId: String) {
     routing {
         kjonnStatistikkRoutes(projectId, logger)
         kjonnAvdelingRoutes(projectId, logger)
-        // kjonnSeksjonRoutes(projectId, logger)
-        // kjonnRolleRoutes(projectId, logger)
-        // kjonnAldersgruppeRoutes(projectId, logger)
-        // kjonnAnsiennitetsgruppeRoutes(projectId, logger)
-        // aldersgruppePerRolle(projectId, logger)
         avdelingSeksjonRoutes(projectId, logger)
         kjonnStillingsnavnRoutes(projectId, logger)
         sistoppdatertRoutes(projectId, logger)
