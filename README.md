@@ -169,25 +169,7 @@ Response:
 ]
 ```
 
-### Alle tilgjengelige endepunkter
-- `/kjonn-statistikk` - Total kjønnsfordeling
-- `/kjonn-per-avdeling` - Kjønnsfordeling per avdeling
-- `/alder-kjonn-per-avdeling` - Kjønn og alder per avdeling
-- `/ansiennitet-kjonn-per-avdeling` - Kjønn og ansiennitet per avdeling
-- `/kjonn-per-seksjon` - Kjønnsfordeling per seksjon
-- `/alder-kjonn-per-seksjon` - Kjønn og alder per seksjon
-- `/ansiennitet-kjonn-per-seksjon` - Kjønn og ansiennitet per seksjon
-- `/lederniva-kjonn-per-seksjon` - Kjønn og ledernivå per seksjon
-- `/kjonn-per-rolle` - Kjønnsfordeling per rolle
-- `/aldersgruppe-per-rolle` - Kjønn og alder per rolle
-- `/kjonn-per-lederniva` - Kjønnsfordeling per ledernivå
-- `/kjonn-per-aldersgruppe` - Kjønnsfordeling per aldersgruppe
-- `/kjonn-per-ansiennitetsgruppe` - Kjønnsfordeling per ansiennitetsgruppe
-- `/nyansatte-per-aar` - Statistikk over nyansettelser per år
-- `/avdelinger-med-seksjoner` - Kjønnsfordeling per seksjon gruppert under avdelinger
-- `/lederniva-kjonn-per-avdeling` - Kjønnsfordeling per ledernivå gruppert på avdeling
-- `/kjonn-per-stilling` - Kjønnsfordeling per stillingsnavn
-- `/aldersgruppe-per-stilling` - Kjønnsfordeling per aldersgruppe og stillingsnavn
+
 
 
 ## Deployment
