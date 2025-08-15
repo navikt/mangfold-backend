@@ -1,12 +1,12 @@
 
-val ktorVersion = "3.2.0"
+val ktorVersion = "3.2.3"
 val logbackVersion = "1.5.18"
 val logstashEncoderVersion = "8.1"
-val junitVersion = "5.13.1"
+val junitVersion = "5.13.4"
 val mainClassName = "no.nav.MainKt"
 
 plugins {
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm") version "2.2.10"
     kotlin("plugin.serialization") version "1.9.0"
     application
 }
@@ -30,7 +30,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-    implementation(platform("com.google.cloud:libraries-bom:26.62.0"))
+    implementation(platform("com.google.cloud:libraries-bom:26.65.0"))
     implementation("com.google.cloud:google-cloud-bigquery")
 
 
@@ -39,7 +39,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
 
 }
 
