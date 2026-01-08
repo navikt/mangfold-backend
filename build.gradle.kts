@@ -7,7 +7,7 @@ val mainClassName = "no.nav.MainKt"
 
 plugins {
     kotlin("jvm") version "2.3.0"
-    kotlin("plugin.serialization") version "1.9.0"
+    kotlin("plugin.serialization") version "2.3.0"
     application
 }
 
