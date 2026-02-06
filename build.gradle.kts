@@ -6,7 +6,7 @@ val junitVersion = "5.13.4"
 val mainClassName = "no.nav.MainKt"
 
 plugins {
-    kotlin("jvm") version "2.3.0"
+    kotlin("jvm") version "2.3.10"
     kotlin("plugin.serialization") version "1.9.0"
     application
 }
