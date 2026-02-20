@@ -1,6 +1,6 @@
 
 val ktorVersion = "3.4.0"
-val logbackVersion = "1.5.31"
+val logbackVersion = "1.5.32"
 val logstashEncoderVersion = "8.1"
 val junitVersion = "5.13.4"
 val mainClassName = "no.nav.MainKt"
